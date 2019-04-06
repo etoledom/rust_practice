@@ -18,18 +18,9 @@ fn convert_to_string(pi: f64, number_of_decimals: u16) -> String {
 /// Implementation of Bailey–Borwein–Plouffe formula
 /// https://en.wikipedia.org/wiki/Bailey–Borwein–Plouffe_formula
 fn bbp(until: i32) -> f64 {
-    return bbp_sumation(until, 0, 0_f64);
-}
-
-/// Main summation of Bailey–Borwein–Plouffe formula.
-/// 
-/// * `until` - Total of iterations.
-/// * `current_iteration` - The current iteration index.
-/// * `pi` - Compound adition of pi (buffer).
-fn bbp_sumation(until: i32, current_iteration: i32, pi: f64) -> f64 {
-    match current_iteration {
-        index if index == until => pi,
-        _ => bbp_sumation(until, current_iteration+1, pi + bbp_sumation_iteration(current_iteration)),
+    match until {
+        0 => bbp_sumation_iteration(0),
+        _ => bbp_sumation_iteration(until) + bbp(until - 1),
     }
 }
 
