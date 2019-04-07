@@ -1,0 +1,11 @@
+[[package]]
+name = "find_e_n_digits"
+version = "0.1.0"
+dependencies = [
+ "utilities 0.1.0",
+]
+
+[[package]]
+name = "utilities"
+version = "0.1.0"
+
