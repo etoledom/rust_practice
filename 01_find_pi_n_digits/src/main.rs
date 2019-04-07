@@ -1,8 +1,9 @@
-mod read_number_input;
+extern crate utilities;
 mod pi;
 
 fn main() {
-    let decimals_count = read_number_input::read_non_negative_number();
+    let title = "Enter the number of Pi decimals:";
+    let decimals_count = utilities::read_number_input::read_non_negative_number(title);
     let pi = pi::calculate(decimals_count);
-    println!("Pi: {}", pi);
+    println!("π: {}", pi);
 }
