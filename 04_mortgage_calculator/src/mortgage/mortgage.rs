@@ -1,4 +1,4 @@
-fn mortgage(principal: f64, interest_rate: f64, number_of_payments: i32) -> f64 {
+pub fn mortgage(principal: f64, interest_rate: f64, number_of_payments: i32) -> f64 {
     let one_plus_rate = 1.0 + interest_rate;
     let one_plus_rate_pow_n = one_plus_rate.powi(number_of_payments);
     return principal * interest_rate * one_plus_rate_pow_n / (one_plus_rate_pow_n - 1.0);

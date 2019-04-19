@@ -26,4 +26,15 @@ pub mod read_number_input {
         io::stdin().read_line(&mut user_input).expect("Failed to read input");
         return user_input.trim().to_string();
     }
+
+    pub fn read_float(title: &str) -> f64 {
+        println!("{}", title);
+        let user_input = read_input();
+        match user_input.parse::<f64>() {
+            Ok(n) => return n,
+            Err(_err) => {
+                return read_float(title);
+            },
+        }
+    }
 }

@@ -3,4 +3,11 @@
 [[package]]
 name = "mortgage_calculator"
 version = "0.1.0"
+dependencies = [
+ "utilities 0.1.0",
+]
+
+[[package]]
+name = "utilities"
+version = "0.1.0"
 
