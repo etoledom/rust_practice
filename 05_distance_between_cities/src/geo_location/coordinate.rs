@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub struct Coordinate {
     pub latitude: f64,
     pub longitude: f64,
@@ -9,6 +11,16 @@ impl Coordinate {
             latitude: self.latitude.to_radians(),
             longitude: self.longitude.to_radians(),
         };
+    }
+}
+
+impl fmt::Display for Coordinate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(
+            f,
+            "{{\n\tLat: {}\n\tLng: {}\n}}",
+            self.latitude, self.longitude
+        );
     }
 }
 

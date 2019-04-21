@@ -1,14 +1,14 @@
 pub mod coordinate;
 use coordinate::Coordinate;
 
-pub fn calculate_delta(first: &Coordinate, second: &Coordinate) -> Coordinate {
+fn calculate_delta(first: &Coordinate, second: &Coordinate) -> Coordinate {
     return Coordinate {
         latitude: (first.latitude - second.latitude),
         longitude: (first.longitude - second.longitude),
     };
 }
 
-fn calculate_distance(first: Coordinate, second: Coordinate) -> f64 {
+pub fn calculate_distance(first: Coordinate, second: Coordinate) -> f64 {
     let earth_radius_kilometer = 6371.0_f64;
     let delta = calculate_delta(&first, &second);
 
@@ -46,7 +46,7 @@ mod tests {
     fn test_distance() {
         let paris = super::Coordinate {
             latitude: 48.85341_f64,
-            longitude: -2.34880_f64,
+            longitude: 2.34880_f64,
         };
         let london = super::Coordinate {
             latitude: 51.50853_f64,
@@ -56,6 +56,6 @@ mod tests {
         let distance = super::calculate_distance(paris, london);
         let distance_string = format!("{:.2}", distance);
 
-        assert_eq!(distance_string, "334.96");
+        assert_eq!(distance_string, "343.77");
     }
 }
