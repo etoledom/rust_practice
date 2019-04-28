@@ -143,42 +143,38 @@ impl Game {
     }
 
     pub fn draw(&self) -> Vec<Block> {
-        let mut blocks = Vec::new();
+        return [
+            self.snake.draw(),
+            self.draw_food(),
+            self.draw_walls(),
+            self.draw_game_over_layer(),
+        ]
+        .concat();
+    }
 
-        let mut snake = self.snake.draw();
-        blocks.append(&mut snake);
-
+    fn draw_food(&self) -> Vec<Block> {
         if let Some(food) = self.food {
-            let food_block = Block::new(food.x, food.y, 1, 1, FOOD_COLOR);
-            blocks.push(food_block);
+            return vec![Block::new(food.x, food.y, 1, 1, FOOD_COLOR)];
         }
-        blocks.push(Block::new(0, 0, self.size.height, 1, BORDER_COLOR));
-        blocks.push(Block::new(
-            self.size.width - 1,
-            0,
-            self.size.height,
-            1,
-            BORDER_COLOR,
-        ));
-        blocks.push(Block::new(0, 0, 1, self.size.width, BORDER_COLOR));
-        blocks.push(Block::new(
-            0,
-            self.size.height - 1,
-            1,
-            self.size.width,
-            BORDER_COLOR,
-        ));
+        return vec![];
+    }
 
+    fn draw_walls(&self) -> Vec<Block> {
+        let (height, width) = (self.size.height, self.size.width);
+        return vec![
+            Block::new(0, 0, height, 1, BORDER_COLOR),
+            Block::new(width - 1, 0, height, 1, BORDER_COLOR),
+            Block::new(width - 1, 0, height, 1, BORDER_COLOR),
+            Block::new(0, height - 1, 1, width, BORDER_COLOR),
+        ];
+    }
+
+    fn draw_game_over_layer(&self) -> Vec<Block> {
         if self.game_over {
-            blocks.push(Block::new(
-                0,
-                0,
-                self.size.height,
-                self.size.width,
-                GAME_OVER_COLOR,
-            ));
+            let (height, width) = (self.size.height, self.size.width);
+            return vec![Block::new(0, 0, height, width, GAME_OVER_COLOR)];
         }
-        return blocks;
+        return vec![];
     }
 }
 
@@ -286,6 +282,39 @@ mod game_tests {
         game.update_snake(Some(Direction::Up));
         game.update_snake(Some(Direction::Up));
         assert!(game.game_over);
+    }
+    #[test]
+    fn test_draw_food() {
+        let game = new_game();
+        let food = game.draw_food();
+        assert_eq!(food.len(), 1);
+    }
+    #[test]
+    fn test_food_not_drawn() {
+        let mut game = new_game();
+        game.food = None;
+        let food = game.draw_food();
+        assert_eq!(food.len(), 0);
+    }
+    #[test]
+    fn test_draw_walls() {
+        let game = new_game();
+        let walls = game.draw_walls();
+        assert_eq!(walls.len(), 4);
+    }
+    #[test]
+    fn test_draw_game_over_layer() {
+        let mut game = new_game();
+        game.game_over = true;
+        let layer = game.draw_game_over_layer();
+        assert_eq!(layer.len(), 1);
+    }
+    #[test]
+    fn test_does_not_draw_game_over_layer() {
+        let mut game = new_game();
+        game.game_over = false;
+        let layer = game.draw_game_over_layer();
+        assert_eq!(layer.len(), 0);
     }
 
     fn new_game() -> Game {
