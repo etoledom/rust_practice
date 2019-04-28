@@ -27,6 +27,7 @@ const GAME_OVER_COLOR: Color = Color {
 
 const MOVING_PERIOD: f64 = 0.2;
 const RESTART_TIME: f64 = 1.0;
+const INITIAL_FOOD: Point = Point { x: 6, y: 4 };
 
 pub trait Randomizer {
     fn random_between(&self, lower: u32, higher: u32) -> u32;
@@ -34,9 +35,7 @@ pub trait Randomizer {
 
 pub struct Game {
     snake: Snake,
-    food_exists: bool,
-    food_x: u32,
-    food_y: u32,
+    food: Option<Point>,
     size: Size,
     game_over: bool,
     waiting_time: f64,
@@ -47,9 +46,7 @@ impl Game {
         return Game {
             snake: Snake::new(Point { x: 4, y: 2 }),
             waiting_time: 0.0,
-            food_exists: true,
-            food_x: 6,
-            food_y: 4,
+            food: Some(INITIAL_FOOD),
             size,
             game_over: false,
         };
@@ -84,7 +81,7 @@ impl Game {
             return;
         }
 
-        if !self.food_exists {
+        if self.food.is_none() {
             self.add_food(randomizer);
         }
 
@@ -95,9 +92,11 @@ impl Game {
 
     fn check_eaten(&mut self) {
         let head = self.snake.head_position();
-        if self.food_exists && self.food_x == head.x && self.food_y == head.y {
-            self.food_exists = false;
-            self.snake.restore_tail();
+        if let Some(food) = self.food {
+            if food.x == head.x && food.y == head.y {
+                self.food = None;
+                self.snake.restore_tail();
+            }
         }
     }
 
@@ -115,17 +114,15 @@ impl Game {
     }
 
     fn add_food(&mut self, randomizer: &impl Randomizer) {
-        let mut new_x = randomizer.random_between(1, self.size.width - 1);
-        let mut new_y = randomizer.random_between(1, self.size.height - 1);
+        let mut x = randomizer.random_between(1, self.size.width - 1);
+        let mut y = randomizer.random_between(1, self.size.height - 1);
 
-        while self.snake.is_overlaping(&Point { x: new_x, y: new_y }) {
-            new_x = randomizer.random_between(1, self.size.width - 1);
-            new_y = randomizer.random_between(1, self.size.height - 1);
+        while self.snake.is_overlaping(&Point { x, y }) {
+            x = randomizer.random_between(1, self.size.width - 1);
+            y = randomizer.random_between(1, self.size.height - 1);
         }
 
-        self.food_x = new_x;
-        self.food_y = new_y;
-        self.food_exists = true;
+        self.food = Some(Point { x, y });
     }
 
     fn update_snake(&mut self, direction: Option<Direction>) {
@@ -141,9 +138,7 @@ impl Game {
     fn restart(&mut self) {
         self.snake = Snake::new(Point { x: 2, y: 2 });
         self.waiting_time = 0.0;
-        self.food_exists = true;
-        self.food_x = 6;
-        self.food_y = 4;
+        self.food = Some(INITIAL_FOOD);
         self.game_over = false;
     }
 
@@ -153,9 +148,9 @@ impl Game {
         let mut snake = self.snake.draw();
         blocks.append(&mut snake);
 
-        if self.food_exists {
-            let food = Block::new(self.food_x, self.food_y, 1, 1, FOOD_COLOR);
-            blocks.push(food);
+        if let Some(food) = self.food {
+            let food_block = Block::new(food.x, food.y, 1, 1, FOOD_COLOR);
+            blocks.push(food_block);
         }
         blocks.push(Block::new(0, 0, self.size.height, 1, BORDER_COLOR));
         blocks.push(Block::new(
@@ -219,41 +214,47 @@ mod game_tests {
     #[test]
     fn test_add_food() {
         let mut game = new_game();
-        game.food_exists = false;
+        game.food = None;
         let randomizer = TestRandomizer {
             number_completely_random: 10,
         };
         game.add_food(&randomizer);
-        assert!(game.food_exists);
-        assert_eq!(game.food_x, randomizer.number_completely_random);
-        assert_eq!(game.food_y, randomizer.number_completely_random);
+        assert!(game.food.is_some());
+        assert_eq!(game.food.unwrap().x, randomizer.number_completely_random);
+        assert_eq!(game.food.unwrap().y, randomizer.number_completely_random);
     }
     #[test]
     fn test_has_not_eaten_with_food_out_of_range() {
         let mut game = new_game();
         // Set food far away from snake
-        game.food_x = game.snake.head_position().x + 10;
-        game.food_y = game.snake.head_position().y + 10;
+        let far_away_point = Point {
+            x: game.snake.head_position().x + 10,
+            y: game.snake.head_position().y + 10,
+        };
+        game.food = Some(far_away_point);
         let snake_length = game.snake.len();
         // One step to the right
         game.update_snake(Some(Direction::Right));
         let snake_new_length = game.snake.len();
         // Food was not eaten
-        assert!(game.food_exists);
+        assert!(game.food.is_some());
         assert_eq!(snake_length, snake_new_length);
     }
     #[test]
     fn test_has_eaten_with_food_on_range() {
         let mut game = new_game();
         // Set food at the right of the snake
-        game.food_x = game.snake.head_position().x + 1;
-        game.food_y = game.snake.head_position().y;
+        let near_point = Point {
+            x: game.snake.head_position().x + 1,
+            y: game.snake.head_position().y,
+        };
+        game.food = Some(near_point);
         let snake_length = game.snake.len();
         // One step at the right
         game.update_snake(Some(Direction::Right));
         let snake_new_length = game.snake.len();
         // Food has been eaten
-        assert!(game.food_exists == false);
+        assert!(game.food.is_none());
         assert_eq!(snake_length + 1, snake_new_length);
     }
     #[test]
@@ -266,8 +267,11 @@ mod game_tests {
     fn test_snake_dies_by_overlaping_itself() {
         let mut game = new_game();
         // Set food at the right of the snake to let it grow enough
-        game.food_x = game.snake.head_position().x + 1;
-        game.food_y = game.snake.head_position().y;
+        let near_point = Point {
+            x: game.snake.head_position().x + 1,
+            y: game.snake.head_position().y,
+        };
+        game.food = Some(near_point);
 
         game.update_snake(Some(Direction::Right));
         game.update_snake(Some(Direction::Down));
