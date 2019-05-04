@@ -5,5 +5,6 @@ authors = ["etoledom <etoledom@icloud.com>"]
 edition = "2018"
 
 [dependencies]
+utilities =  { path = "../utilities" }
 piston_window = "0.89.0"
 rand = "0.6.5"
