@@ -1,6 +1,5 @@
-extern crate utilities;
-use utilities::geometry::{Point, Rect, Size};
-use utilities::graphics::Color;
+use super::geometry::{Point, Rect, Size};
+use super::graphics::Color;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {

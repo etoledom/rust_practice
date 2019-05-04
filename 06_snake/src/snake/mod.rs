@@ -1,7 +1,6 @@
-pub mod block;
 mod button;
 mod game;
 mod snake;
-pub use block::Block;
+extern crate utilities;
 pub use button::Button;
 pub use game::{Game, Randomizer};
