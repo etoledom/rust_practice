@@ -1,7 +1,6 @@
 use super::figure_type::FigureType;
 use super::matrix::Matrix;
-use utilities::block::Block;
-use utilities::geometry::{Point, Rect, Size};
+use utilities::geometry::Point;
 use utilities::graphics::Color;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -27,32 +26,9 @@ impl Figure {
         return self.figure_type.color();
     }
 
-    fn block_at_xy(&self, x: u32, y: u32) -> Block {
-        return Block {
-            rect: Rect {
-                origin: Point { x, y },
-                size: Size {
-                    height: 1,
-                    width: 1,
-                },
-            },
-            color: self.figure_type.color(),
-        };
-    }
-
     pub fn rotated(&self) -> Self {
-        let mut data = vec![];
-        let matrix_length = self.matrix.data.len();
-        for i in 0..matrix_length {
-            let mut vec = vec![];
-            for j in 0..matrix_length {
-                vec.push(self.matrix.data[(matrix_length - 1) - j][i]);
-            }
-            data.push(vec);
-        }
-
         return Figure {
-            matrix: Matrix { data },
+            matrix: self.matrix.rotated(),
             figure_type: self.figure_type.clone(),
         };
     }
@@ -61,7 +37,7 @@ impl Figure {
         let mut points = vec![];
         for y in 0..=2 {
             for x in 0..=2 {
-                if self.matrix.data[y][x] == 1 {
+                if self.matrix.at_xy(x, y) == 1 {
                     points.push(Point {
                         x: x as u32,
                         y: y as u32,

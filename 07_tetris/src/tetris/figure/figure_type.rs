@@ -76,18 +76,18 @@ impl FigureType {
 
     pub fn initial_matrix(&self) -> Matrix {
         let vectors = match self {
-            FigureType::I => self.draw_I(),
-            FigureType::J => self.draw_J(),
-            FigureType::L => self.draw_L(),
-            FigureType::O => self.draw_O(),
-            FigureType::S => self.draw_S(),
-            FigureType::T => self.draw_T(),
-            FigureType::Z => self.draw_Z(),
+            FigureType::I => self.draw_i(),
+            FigureType::J => self.draw_j(),
+            FigureType::L => self.draw_l(),
+            FigureType::O => self.draw_o(),
+            FigureType::S => self.draw_s(),
+            FigureType::T => self.draw_t(),
+            FigureType::Z => self.draw_z(),
         };
         return Matrix { data: vectors };
     }
 
-    fn draw_I(&self) -> Vec<Vec<u8>> {
+    fn draw_i(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![0, 0, 0, 0], //
             vec![1, 1, 1, 1],
@@ -96,7 +96,7 @@ impl FigureType {
         ];
     }
 
-    fn draw_J(&self) -> Vec<Vec<u8>> {
+    fn draw_j(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![1, 0, 0], //
             vec![1, 1, 1],
@@ -104,7 +104,7 @@ impl FigureType {
         ];
     }
 
-    fn draw_L(&self) -> Vec<Vec<u8>> {
+    fn draw_l(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![0, 0, 1], //
             vec![1, 1, 1],
@@ -112,14 +112,14 @@ impl FigureType {
         ];
     }
 
-    fn draw_O(&self) -> Vec<Vec<u8>> {
+    fn draw_o(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![1, 1], //
             vec![1, 1],
         ];
     }
 
-    fn draw_S(&self) -> Vec<Vec<u8>> {
+    fn draw_s(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![0, 1, 1], //
             vec![1, 1, 0],
@@ -127,7 +127,7 @@ impl FigureType {
         ];
     }
 
-    fn draw_T(&self) -> Vec<Vec<u8>> {
+    fn draw_t(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![0, 1, 0], //
             vec![1, 1, 1],
@@ -135,7 +135,7 @@ impl FigureType {
         ];
     }
 
-    fn draw_Z(&self) -> Vec<Vec<u8>> {
+    fn draw_z(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![1, 1, 0], //
             vec![0, 1, 1],
