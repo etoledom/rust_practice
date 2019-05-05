@@ -8,6 +8,7 @@ pub use utilities::block::Block;
 use utilities::geometry::{Point, Rect, Size};
 use utilities::graphics::Color;
 
+const MOVING_PERIOD: f64 = 0.2; //secs
 const BACKGROUND_COLOR: Color = Color {
     red: 1.0,
     green: 1.0,
@@ -39,14 +40,15 @@ struct Game {
     board: Vec<Vec<Option<FigureType>>>,
     points: u128,
     active: ActiveFigure,
+    waiting_time: f64,
 }
 
 impl Game {
     fn new(size: Size) -> Game {
         let mut board = vec![];
-        for _y in 0..=size.height {
+        for _y in 0..size.height {
             let mut line: Vec<Option<FigureType>> = vec![];
-            for _x in 0..=size.width {
+            for _x in 0..size.width {
                 line.push(None);
             }
             board.push(line);
@@ -61,6 +63,7 @@ impl Game {
             board,
             points: 0,
             active,
+            waiting_time: 0.0,
         };
     }
 
@@ -77,14 +80,56 @@ impl Game {
         return blocks;
     }
 
-    fn move_active_figure_down(&mut self) {
-        let new_active = ActiveFigure {
+    pub fn update(&mut self, delta_time: f64) {
+        self.waiting_time += delta_time;
+        if self.waiting_time > MOVING_PERIOD {
+            self.update_game();
+            self.waiting_time = 0.0;
+        }
+    }
+
+    fn update_game(&mut self) {
+        if self.can_move_down() {
+            self.move_active_figure_down();
+        }
+    }
+
+    fn can_move_down(&self) -> bool {
+        return !self.is_at_the_bottom() && !self.will_colide_with_block();
+    }
+
+    fn is_at_the_bottom(&self) -> bool {
+        return self.active.to_cartesian().iter().fold(false, |acc, point| {
+            acc || point.y == ((self.board.len() - 1) as u32)
+        });
+    }
+
+    fn will_colide_with_block(&self) -> bool {
+        let moved_down_points = self.active_figure_moved_down().to_cartesian();
+        for point in moved_down_points {
+            if self.board_contains(point) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn board_contains(&self, point: Point) -> bool {
+        return self.board[point.y as usize][point.x as usize].is_some();
+    }
+
+    fn active_figure_moved_down(&self) -> ActiveFigure {
+        return ActiveFigure {
             figure: self.active.figure.clone(),
             position: Point {
                 x: self.active.position.x,
                 y: self.active.position.y + 1,
             },
         };
+    }
+
+    fn move_active_figure_down(&mut self) {
+        let new_active = self.active_figure_moved_down();
         self.update_active_with(new_active);
     }
 
@@ -159,6 +204,35 @@ mod game_tests {
         game.rotate_active_figure();
         let drawed_points = draw_to_cartesian(game.draw());
         assert_eq!(drawed_points, rotated_active.to_cartesian());
+    }
+    #[test]
+    fn test_active_figure_is_at_the_bottom() {
+        let mut game = Game::new(Size {
+            height: 4,
+            width: 20,
+        });
+        game.move_active_figure_down();
+        assert!(!game.is_at_the_bottom());
+        game.move_active_figure_down();
+        assert!(game.is_at_the_bottom());
+    }
+    #[test]
+    fn test_will_colide_with_block() {
+        let mut game = get_game();
+        game.board = vec![
+            vec![None, None, None, None],
+            vec![None, None, None, None],
+            vec![None, None, None, None],
+            vec![
+                Some(FigureType::I),
+                Some(FigureType::I),
+                Some(FigureType::I),
+                Some(FigureType::I),
+            ],
+        ];
+        assert!(!game.will_colide_with_block());
+        game.move_active_figure_down();
+        assert!(game.will_colide_with_block());
     }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();
