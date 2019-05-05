@@ -5,3 +5,4 @@ authors = ["etoledom <etoledom@icloud.com>"]
 edition = "2018"
 
 [dependencies]
+utilities = { path = "../utilities" }

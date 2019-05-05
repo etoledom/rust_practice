@@ -3,7 +3,7 @@ use super::graphics::Color;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {
-	rect: Rect,
+	pub rect: Rect,
 	pub color: Color,
 }
 
