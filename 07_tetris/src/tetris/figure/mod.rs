@@ -1,8 +1,9 @@
 mod figure;
+mod figure_type;
 mod matrix;
-mod t_figure;
 extern crate utilities;
-use figure::{Figure, FigureType};
+use figure::Figure;
+use figure_type::FigureType;
 pub use utilities::block::Block;
 use utilities::geometry::{Point, Rect, Size};
 use utilities::graphics::Color;
@@ -52,7 +53,7 @@ impl Game {
         }
 
         let active = ActiveFigure {
-            figure: Figure::new(),
+            figure: Figure::new(FigureType::T),
             position: Point { x: 0, y: 0 },
         };
 
@@ -122,16 +123,50 @@ mod game_tests {
     use super::*;
     #[test]
     fn test_active_figure_is_added_to_the_board() {
-        let mut game = Game::new(Size {
-            height: 40,
-            width: 20,
-        });
+        let mut game = get_game();
         let active_points = game.active.to_cartesian();
 
         game.add_active_figure_from_board();
-        let drawed = game.draw();
-        let drawed_points: Vec<Point> = drawed.iter().map(|block| block.position()).collect();
+        let drawed_points = draw_to_cartesian(game.draw());
 
         assert_eq!(drawed_points, active_points);
+    }
+    #[test]
+    fn test_active_figure_moves_down() {
+        let mut game = get_game();
+        let first_position = game.active.to_cartesian();
+        let expected: Vec<Point> = first_position
+            .iter()
+            .map(|point| Point {
+                x: point.x,
+                y: point.y + 1,
+            })
+            .collect();
+
+        game.move_active_figure_down();
+        let drawed_points = draw_to_cartesian(game.draw());
+
+        assert_eq!(drawed_points, expected);
+    }
+    #[test]
+    fn test_rotate_active_figure() {
+        let mut game = get_game();
+        let rotated = game.active.figure.rotated();
+        let rotated_active = ActiveFigure {
+            figure: rotated,
+            position: game.active.position,
+        };
+        game.rotate_active_figure();
+        let drawed_points = draw_to_cartesian(game.draw());
+        assert_eq!(drawed_points, rotated_active.to_cartesian());
+    }
+    fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
+        return draw.iter().map(|block| block.position()).collect();
+    }
+    fn get_game() -> Game {
+        return Game::new(Size {
+            height: 40,
+            width: 20,
+        });
     }
 }
