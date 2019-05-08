@@ -1,6 +1,7 @@
 extern crate utilities;
 use super::active_figure::ActiveFigure;
 use super::figure::{Figure, FigureType};
+use super::Board;
 pub use utilities::block::Block;
 use utilities::geometry::{Point, Size};
 use utilities::graphics::Color;
@@ -14,7 +15,7 @@ const BACKGROUND_COLOR: Color = Color {
 };
 
 struct Game {
-    board: Vec<Vec<Option<FigureType>>>,
+    board: Board,
     points: u128,
     active: ActiveFigure,
     waiting_time: f64,
@@ -22,17 +23,8 @@ struct Game {
 
 impl Game {
     fn new(size: Size) -> Game {
-        let mut board = vec![];
-        for _y in 0..size.height {
-            let mut line: Vec<Option<FigureType>> = vec![];
-            for _x in 0..size.width {
-                line.push(None);
-            }
-            board.push(line);
-        }
-
         let active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 0 });
-
+        let board = Board::new(size);
         return Game {
             board,
             points: 0,
@@ -57,10 +49,10 @@ impl Game {
 
     fn draw_board(&self) -> Vec<Block> {
         let mut blocks = vec![];
-        for y in 0..self.board.len() {
-            for x in 0..self.board[y].len() {
-                if let Some(square) = &self.board[y][x] {
-                    let block = Block::new(x as u32, y as u32, 1, 1, square.color());
+        for y in 0..self.board.height() {
+            for x in 0..self.board.width() {
+                if let Some(square) = self.board.figure_at_xy(x, y) {
+                    let block = Block::new(x, y, 1, 1, square.color());
                     blocks.push(block);
                 }
             }
@@ -88,7 +80,7 @@ impl Game {
 
     fn is_at_the_bottom(&self) -> bool {
         return self.active.to_cartesian().iter().fold(false, |acc, point| {
-            acc || point.y == ((self.board.len() - 1) as u32)
+            acc || point.y == ((self.board.height() - 1) as u32)
         });
     }
 
@@ -103,7 +95,7 @@ impl Game {
     }
 
     fn board_contains(&self, point: Point) -> bool {
-        return self.board[point.y as usize][point.x as usize].is_some();
+        return self.board.figure_at_xy(point.x, point.y).is_some();
     }
 
     fn active_figure_moved_down(&self) -> ActiveFigure {
@@ -174,18 +166,16 @@ mod game_tests {
     }
     #[test]
     fn test_will_colide_with_block() {
-        let mut game = get_game();
-        game.board = vec![
-            vec![None, None, None, None],
-            vec![None, None, None, None],
-            vec![None, None, None, None],
-            vec![
-                Some(FigureType::I),
-                Some(FigureType::I),
-                Some(FigureType::I),
-                Some(FigureType::I),
-            ],
-        ];
+        let mut game = Game::new(Size {
+            height: 4,
+            width: 4,
+        });
+
+        game.board.replace_figure_at_xy(0, 3, Some(FigureType::T));
+        game.board.replace_figure_at_xy(1, 3, Some(FigureType::T));
+        game.board.replace_figure_at_xy(2, 3, Some(FigureType::T));
+        game.board.replace_figure_at_xy(3, 3, Some(FigureType::T));
+
         assert!(!game.will_colide_with_block());
         game.move_active_figure_down();
         assert!(game.will_colide_with_block());
