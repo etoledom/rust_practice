@@ -68,6 +68,20 @@ impl Game {
     }
 
     pub fn draw(&self) -> Vec<Block> {
+        let board = self.draw_board();
+        let figure = self.draw_active_figure();
+        return board.iter().chain(&figure).cloned().collect();
+    }
+
+    fn draw_active_figure(&self) -> Vec<Block> {
+        let figure = self.active.to_cartesian();
+        return figure
+            .iter()
+            .map(|point| Block::new(point.x, point.y, 1, 1, self.active.figure.color()))
+            .collect();
+    }
+
+    fn draw_board(&self) -> Vec<Block> {
         let mut blocks = vec![];
         for y in 0..self.board.len() {
             for x in 0..self.board[y].len() {
@@ -143,23 +157,7 @@ impl Game {
     }
 
     fn update_active_with(&mut self, new_active: ActiveFigure) {
-        self.remove_active_figure_from_board();
         self.active = new_active;
-        self.add_active_figure_from_board();
-    }
-
-    fn remove_active_figure_from_board(&mut self) {
-        let positions = self.active.to_cartesian();
-        for point in positions {
-            self.board[point.y as usize][point.x as usize] = None;
-        }
-    }
-
-    fn add_active_figure_from_board(&mut self) {
-        let positions = self.active.to_cartesian();
-        for point in positions {
-            self.board[point.y as usize][point.x as usize] = Some(self.active.figure.get_type());
-        }
     }
 }
 
@@ -168,10 +166,8 @@ mod game_tests {
     use super::*;
     #[test]
     fn test_active_figure_is_added_to_the_board() {
-        let mut game = get_game();
+        let game = get_game();
         let active_points = game.active.to_cartesian();
-
-        game.add_active_figure_from_board();
         let drawed_points = draw_to_cartesian(game.draw());
 
         assert_eq!(drawed_points, active_points);
