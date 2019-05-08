@@ -1,4 +1,5 @@
 extern crate utilities;
+use super::active_figure::ActiveFigure;
 use super::figure::{Figure, FigureType};
 pub use utilities::block::Block;
 use utilities::geometry::{Point, Size};
@@ -11,26 +12,6 @@ const BACKGROUND_COLOR: Color = Color {
     blue: 1.0,
     alpha: 1.0,
 };
-
-#[derive(Debug, Clone, PartialEq)]
-struct ActiveFigure {
-    figure: Figure,
-    position: Point,
-}
-
-impl ActiveFigure {
-    fn to_cartesian(&self) -> Vec<Point> {
-        let figure_points = self.figure.to_cartesian();
-        let (dx, dy) = (self.position.x, self.position.y);
-        return figure_points
-            .iter()
-            .map(|point| Point {
-                x: point.x + dx,
-                y: point.y + dy,
-            })
-            .collect();
-    }
-}
 
 struct Game {
     board: Vec<Vec<Option<FigureType>>>,
@@ -50,10 +31,7 @@ impl Game {
             board.push(line);
         }
 
-        let active = ActiveFigure {
-            figure: Figure::new(FigureType::T),
-            position: Point { x: 0, y: 0 },
-        };
+        let active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 0 });
 
         return Game {
             board,
@@ -73,7 +51,7 @@ impl Game {
         let figure = self.active.to_cartesian();
         return figure
             .iter()
-            .map(|point| Block::new(point.x, point.y, 1, 1, self.active.figure.color()))
+            .map(|point| Block::new(point.x, point.y, 1, 1, self.active.color()))
             .collect();
     }
 
@@ -129,13 +107,7 @@ impl Game {
     }
 
     fn active_figure_moved_down(&self) -> ActiveFigure {
-        return ActiveFigure {
-            figure: self.active.figure.clone(),
-            position: Point {
-                x: self.active.position.x,
-                y: self.active.position.y + 1,
-            },
-        };
+        return self.active.updating_position_by_xy(0, 1);
     }
 
     fn move_active_figure_down(&mut self) {
@@ -144,11 +116,7 @@ impl Game {
     }
 
     fn rotate_active_figure(&mut self) {
-        let figure = self.active.figure.rotated();
-        let new_active = ActiveFigure {
-            figure,
-            position: self.active.position,
-        };
+        let new_active = self.active.rotated();
         self.update_active_with(new_active);
     }
 
@@ -188,14 +156,10 @@ mod game_tests {
     #[test]
     fn test_rotate_active_figure() {
         let mut game = get_game();
-        let rotated = game.active.figure.rotated();
-        let rotated_active = ActiveFigure {
-            figure: rotated,
-            position: game.active.position,
-        };
+        let rotated = game.active.rotated();
         game.rotate_active_figure();
         let drawed_points = draw_to_cartesian(game.draw());
-        assert_eq!(drawed_points, rotated_active.to_cartesian());
+        assert_eq!(drawed_points, rotated.to_cartesian());
     }
     #[test]
     fn test_active_figure_is_at_the_bottom() {
