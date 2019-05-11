@@ -86,7 +86,7 @@ impl FigureType {
             FigureType::T => self.draw_t(),
             FigureType::Z => self.draw_z(),
         };
-        return Matrix { data: vectors };
+        return Matrix::new(vectors);
     }
 
     fn draw_i(&self) -> Vec<Vec<u8>> {

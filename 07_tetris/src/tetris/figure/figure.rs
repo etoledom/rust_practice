@@ -56,25 +56,17 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![0, 1, 1], vec![0, 1, 0]],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 0], vec![1, 1, 1], vec![0, 1, 0]],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![1, 1, 0], vec![0, 1, 0]],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![1, 1, 1], vec![0, 0, 0]],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+
+        let first_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![0, 1, 1], vec![0, 1, 0]]);
+        let second_rotation_matrix = Matrix::new(vec![vec![0, 0, 0], vec![1, 1, 1], vec![0, 1, 0]]);
+        let third_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![1, 1, 0], vec![0, 1, 0]]);
+        let full_loop_rotation_matrix =
+            Matrix::new(vec![vec![0, 1, 0], vec![1, 1, 1], vec![0, 0, 0]]);
+
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_I_figure_rotation() {
@@ -83,45 +75,34 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![
-                vec![0, 0, 1, 0],
-                vec![0, 0, 1, 0],
-                vec![0, 0, 1, 0],
-                vec![0, 0, 1, 0],
-            ],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![
-                vec![0, 0, 0, 0],
-                vec![0, 0, 0, 0],
-                vec![1, 1, 1, 1],
-                vec![0, 0, 0, 0],
-            ],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![
-                vec![0, 1, 0, 0],
-                vec![0, 1, 0, 0],
-                vec![0, 1, 0, 0],
-                vec![0, 1, 0, 0],
-            ],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![
-                vec![0, 0, 0, 0],
-                vec![1, 1, 1, 1],
-                vec![0, 0, 0, 0],
-                vec![0, 0, 0, 0],
-            ],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+        let first_rotation_matrix = Matrix::new(vec![
+            vec![0, 0, 1, 0],
+            vec![0, 0, 1, 0],
+            vec![0, 0, 1, 0],
+            vec![0, 0, 1, 0],
+        ]);
+        let second_rotation_matrix = Matrix::new(vec![
+            vec![0, 0, 0, 0],
+            vec![0, 0, 0, 0],
+            vec![1, 1, 1, 1],
+            vec![0, 0, 0, 0],
+        ]);
+        let third_rotation_matrix = Matrix::new(vec![
+            vec![0, 1, 0, 0],
+            vec![0, 1, 0, 0],
+            vec![0, 1, 0, 0],
+            vec![0, 1, 0, 0],
+        ]);
+        let full_loop_rotation_matrix = Matrix::new(vec![
+            vec![0, 0, 0, 0],
+            vec![1, 1, 1, 1],
+            vec![0, 0, 0, 0],
+            vec![0, 0, 0, 0],
+        ]);
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_L_figure_rotation() {
@@ -130,25 +111,17 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![0, 1, 0], vec![0, 1, 1]],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 0], vec![1, 1, 1], vec![1, 0, 0]],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![vec![1, 1, 0], vec![0, 1, 0], vec![0, 1, 0]],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 1], vec![1, 1, 1], vec![0, 0, 0]],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+
+        let first_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![0, 1, 0], vec![0, 1, 1]]);
+        let second_rotation_matrix = Matrix::new(vec![vec![0, 0, 0], vec![1, 1, 1], vec![1, 0, 0]]);
+        let third_rotation_matrix = Matrix::new(vec![vec![1, 1, 0], vec![0, 1, 0], vec![0, 1, 0]]);
+        let full_loop_rotation_matrix =
+            Matrix::new(vec![vec![0, 0, 1], vec![1, 1, 1], vec![0, 0, 0]]);
+
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_J_figure_rotation() {
@@ -157,25 +130,17 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 1], vec![0, 1, 0], vec![0, 1, 0]],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 0], vec![1, 1, 1], vec![0, 0, 1]],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![0, 1, 0], vec![1, 1, 0]],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![vec![1, 0, 0], vec![1, 1, 1], vec![0, 0, 0]],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+
+        let first_rotation_matrix = Matrix::new(vec![vec![0, 1, 1], vec![0, 1, 0], vec![0, 1, 0]]);
+        let second_rotation_matrix = Matrix::new(vec![vec![0, 0, 0], vec![1, 1, 1], vec![0, 0, 1]]);
+        let third_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![0, 1, 0], vec![1, 1, 0]]);
+        let full_loop_rotation_matrix =
+            Matrix::new(vec![vec![1, 0, 0], vec![1, 1, 1], vec![0, 0, 0]]);
+
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_S_figure_rotation() {
@@ -184,25 +149,17 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![0, 1, 1], vec![0, 0, 1]],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 0], vec![0, 1, 1], vec![1, 1, 0]],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![vec![1, 0, 0], vec![1, 1, 0], vec![0, 1, 0]],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 1], vec![1, 1, 0], vec![0, 0, 0]],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+
+        let first_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![0, 1, 1], vec![0, 0, 1]]);
+        let second_rotation_matrix = Matrix::new(vec![vec![0, 0, 0], vec![0, 1, 1], vec![1, 1, 0]]);
+        let third_rotation_matrix = Matrix::new(vec![vec![1, 0, 0], vec![1, 1, 0], vec![0, 1, 0]]);
+        let full_loop_rotation_matrix =
+            Matrix::new(vec![vec![0, 1, 1], vec![1, 1, 0], vec![0, 0, 0]]);
+
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_Z_figure_rotation() {
@@ -211,25 +168,17 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let first_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 1], vec![0, 1, 1], vec![0, 1, 0]],
-        };
-        let second_rotation_matrix = Matrix {
-            data: vec![vec![0, 0, 0], vec![1, 1, 0], vec![0, 1, 1]],
-        };
-        let third_rotation_matrix = Matrix {
-            data: vec![vec![0, 1, 0], vec![1, 1, 0], vec![1, 0, 0]],
-        };
-        let full_loop_rotation_matrix = Matrix {
-            data: vec![vec![1, 1, 0], vec![0, 1, 1], vec![0, 0, 0]],
-        };
-        assert_eq!(first_rotation.matrix.data, first_rotation_matrix.data);
-        assert_eq!(second_rotation.matrix.data, second_rotation_matrix.data);
-        assert_eq!(third_rotation.matrix.data, third_rotation_matrix.data);
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            full_loop_rotation_matrix.data
-        );
+
+        let first_rotation_matrix = Matrix::new(vec![vec![0, 0, 1], vec![0, 1, 1], vec![0, 1, 0]]);
+        let second_rotation_matrix = Matrix::new(vec![vec![0, 0, 0], vec![1, 1, 0], vec![0, 1, 1]]);
+        let third_rotation_matrix = Matrix::new(vec![vec![0, 1, 0], vec![1, 1, 0], vec![1, 0, 0]]);
+        let full_loop_rotation_matrix =
+            Matrix::new(vec![vec![1, 1, 0], vec![0, 1, 1], vec![0, 0, 0]]);
+
+        assert_eq!(first_rotation.matrix, first_rotation_matrix);
+        assert_eq!(second_rotation.matrix, second_rotation_matrix);
+        assert_eq!(third_rotation.matrix, third_rotation_matrix);
+        assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
     fn test_O_figure_rotation() {
@@ -238,25 +187,13 @@ mod figure_tests {
         let second_rotation = first_rotation.rotated();
         let third_rotation = second_rotation.rotated();
         let full_loop_rotation = third_rotation.rotated();
-        let how_it_should_always_look_like = Matrix {
-            data: vec![vec![1, 1], vec![1, 1]],
-        };
-        assert_eq!(
-            first_rotation.matrix.data,
-            how_it_should_always_look_like.data
-        );
-        assert_eq!(
-            second_rotation.matrix.data,
-            how_it_should_always_look_like.data
-        );
-        assert_eq!(
-            third_rotation.matrix.data,
-            how_it_should_always_look_like.data
-        );
-        assert_eq!(
-            full_loop_rotation.matrix.data,
-            how_it_should_always_look_like.data
-        );
+
+        let how_it_should_always_look_like = Matrix::new(vec![vec![1, 1], vec![1, 1]]);
+
+        assert_eq!(first_rotation.matrix, how_it_should_always_look_like);
+        assert_eq!(second_rotation.matrix, how_it_should_always_look_like);
+        assert_eq!(third_rotation.matrix, how_it_should_always_look_like);
+        assert_eq!(full_loop_rotation.matrix, how_it_should_always_look_like);
     }
     #[test]
     fn test_draw() {

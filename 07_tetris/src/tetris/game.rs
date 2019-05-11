@@ -171,10 +171,10 @@ mod game_tests {
             width: 4,
         });
 
-        game.board.replace_figure_at_xy(0, 3, Some(FigureType::T));
-        game.board.replace_figure_at_xy(1, 3, Some(FigureType::T));
-        game.board.replace_figure_at_xy(2, 3, Some(FigureType::T));
-        game.board.replace_figure_at_xy(3, 3, Some(FigureType::T));
+        game.board = game.board.replacing_figure_at_xy(0, 3, Some(FigureType::T));
+        game.board = game.board.replacing_figure_at_xy(1, 3, Some(FigureType::T));
+        game.board = game.board.replacing_figure_at_xy(2, 3, Some(FigureType::T));
+        game.board = game.board.replacing_figure_at_xy(3, 3, Some(FigureType::T));
 
         assert!(!game.will_colide_with_block());
         game.move_active_figure_down();
