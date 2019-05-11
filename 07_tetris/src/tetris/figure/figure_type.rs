@@ -76,7 +76,7 @@ impl FigureType {
         };
     }
 
-    pub fn initial_matrix(&self) -> Matrix {
+    pub fn initial_matrix(&self) -> Matrix<u8> {
         let vectors = match self {
             FigureType::I => self.draw_i(),
             FigureType::J => self.draw_j(),

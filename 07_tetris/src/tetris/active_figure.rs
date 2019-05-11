@@ -20,6 +20,7 @@ impl ActiveFigure {
     pub fn to_cartesian(&self) -> Vec<Point> {
         let figure_points = self.figure.to_cartesian();
         let (dx, dy) = (self.position.x, self.position.y);
+
         return figure_points
             .iter()
             .map(|point| Point {
@@ -53,5 +54,34 @@ impl ActiveFigure {
             figure,
             position: self.position,
         };
+    }
+}
+
+#[cfg(test)]
+mod active_figure_tests {
+    use super::*;
+    #[test]
+    fn test_to_cartesian_shifted() {
+        let figure = ActiveFigure::new(FigureType::O, Point { x: 5, y: 5 });
+        let coordinates = figure.to_cartesian();
+        let expectation = vec![
+            Point { x: 5, y: 5 },
+            Point { x: 6, y: 5 },
+            Point { x: 5, y: 6 },
+            Point { x: 6, y: 6 },
+        ];
+        assert_eq!(coordinates, expectation);
+    }
+    #[test]
+    fn test_color() {
+        let figure_type = FigureType::T;
+        let figure = ActiveFigure::new(FigureType::T, Point { x: 0, y: 0 });
+        assert_eq!(figure.color(), figure_type.color());
+    }
+    #[test]
+    fn test_update_position() {
+        let figure = ActiveFigure::new(FigureType::L, Point { x: 0, y: 0 });
+        let moved = figure.updating_position_by_xy(5, 5);
+        assert_eq!(moved.position(), Point { x: 5, y: 5 });
     }
 }

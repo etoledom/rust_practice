@@ -6,7 +6,7 @@ use utilities::graphics::Color;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Figure {
     figure_type: FigureType,
-    matrix: Matrix,
+    matrix: Matrix<u8>,
 }
 
 impl Figure {
@@ -35,13 +35,10 @@ impl Figure {
 
     pub fn to_cartesian(&self) -> Vec<Point> {
         let mut points = vec![];
-        for y in 0..=2 {
-            for x in 0..=2 {
-                if self.matrix.at_xy(x, y) == 1 {
-                    points.push(Point {
-                        x: x as u32,
-                        y: y as u32,
-                    });
+        for y in 0..self.matrix.height() {
+            for x in 0..self.matrix.width() {
+                if *self.matrix.at_xy(x, y) == 1 {
+                    points.push(Point { x, y });
                 }
             }
         }
@@ -270,5 +267,17 @@ mod figure_tests {
         assert_eq!(drawed[1], Point { x: 0, y: 1 });
         assert_eq!(drawed[2], Point { x: 1, y: 1 });
         assert_eq!(drawed[3], Point { x: 2, y: 1 });
+    }
+    #[test]
+    fn test_to_cartesian() {
+        let figure = Figure::new(FigureType::O);
+        let expectation = vec![
+            Point { x: 0, y: 0 },
+            Point { x: 1, y: 0 },
+            Point { x: 0, y: 1 },
+            Point { x: 1, y: 1 },
+        ];
+        let cartesian = figure.to_cartesian();
+        assert_eq!(cartesian, expectation);
     }
 }
