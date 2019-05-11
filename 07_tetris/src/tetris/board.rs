@@ -20,19 +20,24 @@ impl Board {
         return Board { matrix };
     }
 
-    pub fn height(&self) -> u32 {
+    pub fn height(&self) -> usize {
         return self.matrix.height();
     }
 
-    pub fn width(&self) -> u32 {
+    pub fn width(&self) -> usize {
         return self.matrix.width();
     }
 
-    pub fn figure_at_xy(&self, x: u32, y: u32) -> &Option<FigureType> {
+    pub fn figure_at_xy(&self, x: usize, y: usize) -> &Option<FigureType> {
         return self.matrix.at_xy(x, y);
     }
 
-    pub fn replacing_figure_at_xy(&self, x: u32, y: u32, figure_type: Option<FigureType>) -> Board {
+    pub fn replacing_figure_at_xy(
+        &self,
+        x: usize,
+        y: usize,
+        figure_type: Option<FigureType>,
+    ) -> Board {
         let matrix = self.matrix.replacing_at_xy(x, y, figure_type);
         return Board { matrix };
     }

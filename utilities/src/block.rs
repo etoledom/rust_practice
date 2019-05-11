@@ -8,7 +8,7 @@ pub struct Block {
 }
 
 impl Block {
-	pub fn new(x: u32, y: u32, height: u32, width: u32, color: Color) -> Block {
+	pub fn new(x: i32, y: i32, height: u32, width: u32, color: Color) -> Block {
 		return Block {
 			rect: Rect {
 				origin: Point { x, y },

@@ -52,7 +52,7 @@ impl Game {
         for y in 0..self.board.height() {
             for x in 0..self.board.width() {
                 if let Some(square) = self.board.figure_at_xy(x, y) {
-                    let block = Block::new(x, y, 1, 1, square.color());
+                    let block = Block::new(x as i32, y as i32, 1, 1, square.color());
                     blocks.push(block);
                 }
             }
@@ -83,7 +83,7 @@ impl Game {
 
     pub fn move_right(&mut self) {
         let current_position = self.active.position();
-        if current_position.x <= self.board.width() {
+        if current_position.x <= self.board.width() as i32 {
             let moved_right = self.active.updating_position_by_xy(1, 0);
             self.update_active_with(moved_right);
         }
@@ -101,7 +101,7 @@ impl Game {
 
     fn is_at_the_bottom(&self) -> bool {
         return self.active.to_cartesian().iter().fold(false, |acc, point| {
-            acc || point.y == ((self.board.height() - 1) as u32)
+            acc || point.y == (self.board.height() as i32 - 1)
         });
     }
 
@@ -116,7 +116,13 @@ impl Game {
     }
 
     fn board_contains(&self, point: Point) -> bool {
-        return self.board.figure_at_xy(point.x, point.y).is_some();
+        if point.x < 0 || point.y < 0 {
+            return false;
+        }
+        return self
+            .board
+            .figure_at_xy(point.x as usize, point.y as usize)
+            .is_some();
     }
 
     fn active_figure_moved_down(&self) -> ActiveFigure {

@@ -26,22 +26,22 @@ impl<T> Matrix<T> {
         return Matrix { data };
     }
 
-    pub fn height(&self) -> u32 {
-        return self.data.len() as u32;
+    pub fn height(&self) -> usize {
+        return self.data.len();
     }
 
-    pub fn width(&self) -> u32 {
+    pub fn width(&self) -> usize {
         if let Some(line) = self.data.first() {
-            return line.len() as u32;
+            return line.len();
         }
         return 0;
     }
 
-    pub fn at_xy(&self, x: u32, y: u32) -> &T {
-        return &self.data[y as usize][x as usize];
+    pub fn at_xy(&self, x: usize, y: usize) -> &T {
+        return &self.data[y][x];
     }
 
-    pub fn replacing_at_xy(&self, x: u32, y: u32, element: T) -> Matrix<T>
+    pub fn replacing_at_xy(&self, x: usize, y: usize, element: T) -> Matrix<T>
     where
         T: Clone,
     {
@@ -50,7 +50,7 @@ impl<T> Matrix<T> {
         for _y in 0..matrix_length {
             let mut vec = vec![];
             for _x in 0..matrix_length {
-                if _x as u32 == x && _y as u32 == y {
+                if _x == x && _y == y {
                     vec.push(element.clone());
                 }
                 vec.push(self.data[_y][_x].clone());
