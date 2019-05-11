@@ -68,6 +68,27 @@ impl Game {
         }
     }
 
+    pub fn rotate(&mut self) {
+        let rotated = self.active.rotated();
+        self.update_active_with(rotated);
+    }
+
+    pub fn move_left(&mut self) {
+        let current_position = self.active.position();
+        if current_position.x > 0 {
+            let moved_left = self.active.updating_position_by_xy(-1, 0);
+            self.update_active_with(moved_left);
+        }
+    }
+
+    pub fn move_right(&mut self) {
+        let current_position = self.active.position();
+        if current_position.x <= self.board.width() {
+            let moved_right = self.active.updating_position_by_xy(1, 0);
+            self.update_active_with(moved_right);
+        }
+    }
+
     fn update_game(&mut self) {
         if self.can_move_down() {
             self.move_active_figure_down();
@@ -179,6 +200,30 @@ mod game_tests {
         assert!(!game.will_colide_with_block());
         game.move_active_figure_down();
         assert!(game.will_colide_with_block());
+    }
+
+    #[test]
+    fn test_move_left() {
+        let mut game = get_game();
+        game.active = ActiveFigure::new(FigureType::L, Point { x: 10, y: 0 });
+        game.move_left();
+        assert_eq!(game.active.position(), Point { x: 9, y: 0 });
+    }
+    #[test]
+    fn test_move_left_does_not_go_beyond_zero() {
+        let mut game = get_game();
+        game.active = ActiveFigure::new(FigureType::L, Point { x: 2, y: 0 });
+        game.move_left(); // x: 1
+        game.move_left(); // x: 0
+        game.move_left(); // x: 0
+        assert_eq!(game.active.position(), Point { x: 0, y: 0 });
+    }
+    #[test]
+    fn test_move_right() {
+        let mut game = get_game();
+        game.active = ActiveFigure::new(FigureType::L, Point { x: 0, y: 0 });
+        game.move_right();
+        assert_eq!(game.active.position(), Point { x: 1, y: 0 });
     }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();

@@ -38,12 +38,15 @@ impl ActiveFigure {
         return self.position;
     }
 
-    pub fn updating_position_by_xy(&self, x: u32, y: u32) -> ActiveFigure {
+    pub fn updating_position_by_xy(&self, x: i32, y: i32) -> ActiveFigure {
+        let final_x = std::cmp::max(self.position().x as i32 + x, 0);
+        let final_y = std::cmp::max(self.position().y as i32 + y, 0);
+
         return ActiveFigure {
             figure: self.figure.clone(),
             position: Point {
-                x: self.position.x + x,
-                y: self.position.y + y,
+                x: final_x as u32,
+                y: final_y as u32,
             },
         };
     }
