@@ -74,6 +74,9 @@ impl Game {
     }
 
     pub fn move_left(&mut self) {
+        if !self.can_move_left() {
+            return;
+        }
         let left_edge = self.active.left_edge();
         if left_edge > 0 {
             let moved_left = self.active.updating_position_by_xy(-1, 0);
@@ -81,9 +84,22 @@ impl Game {
         }
     }
 
+    fn can_move_left(&self) -> bool {
+        let figure_moved_left = self.active_figure_moved_left();
+        return !self.will_colide_with_block(&figure_moved_left);
+    }
+
+    fn can_move_right(&self) -> bool {
+        let moved_right = self.active_figure_moved_right();
+        return !self.will_colide_with_block(&moved_right);
+    }
+
     pub fn move_right(&mut self) {
+        if !self.can_move_right() {
+            return;
+        }
         let right_edge = self.active.right_edge();
-        if right_edge < self.board.width() as i32 {
+        if right_edge < (self.board.width() - 1) as i32 {
             let moved_right = self.active.updating_position_by_xy(1, 0);
             self.update_active_with(moved_right);
         }
@@ -99,7 +115,8 @@ impl Game {
     }
 
     fn can_move_down(&self) -> bool {
-        return !self.is_at_the_bottom() && !self.will_colide_with_block();
+        let moved_down = self.active_figure_moved_down();
+        return !self.is_at_the_bottom() && !self.will_colide_with_block(&moved_down);
     }
 
     fn is_at_the_bottom(&self) -> bool {
@@ -108,9 +125,10 @@ impl Game {
         });
     }
 
-    fn will_colide_with_block(&self) -> bool {
-        let moved_down_points = self.active_figure_moved_down().to_cartesian();
-        for point in moved_down_points {
+    fn will_colide_with_block(&self, figure: &ActiveFigure) -> bool {
+        let points = figure.to_cartesian();
+        println!("Points: {:?}", points);
+        for point in points {
             if self.board.contains(point) {
                 return true;
             }
@@ -120,6 +138,14 @@ impl Game {
 
     fn active_figure_moved_down(&self) -> ActiveFigure {
         return self.active.updating_position_by_xy(0, 1);
+    }
+
+    fn active_figure_moved_left(&self) -> ActiveFigure {
+        return self.active.updating_position_by_xy(-1, 0);
+    }
+
+    fn active_figure_moved_right(&self) -> ActiveFigure {
+        return self.active.updating_position_by_xy(1, 0);
     }
 
     fn move_active_figure_down(&mut self) {
@@ -212,9 +238,10 @@ mod game_tests {
         game.board = game.board.replacing_figure_at_xy(2, 3, Some(FigureType::T));
         game.board = game.board.replacing_figure_at_xy(3, 3, Some(FigureType::T));
 
-        assert!(!game.will_colide_with_block());
+        assert!(!game.will_colide_with_block(&game.active));
         game.move_active_figure_down();
-        assert!(game.will_colide_with_block());
+        game.move_active_figure_down();
+        assert!(game.will_colide_with_block(&game.active));
     }
 
     #[test]
