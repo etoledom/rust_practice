@@ -14,7 +14,7 @@ const BACKGROUND_COLOR: Color = Color {
     alpha: 1.0,
 };
 
-struct Game {
+pub struct Game {
     board: Board,
     points: u128,
     active: ActiveFigure,
@@ -22,7 +22,7 @@ struct Game {
 }
 
 impl Game {
-    fn new(size: Size) -> Game {
+    pub fn new(size: Size) -> Game {
         let active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 0 });
         let board = Board::new(size);
         return Game {
