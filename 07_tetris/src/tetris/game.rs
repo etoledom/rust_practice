@@ -83,7 +83,7 @@ impl Game {
 
     pub fn move_right(&mut self) {
         let right_edge = self.active.right_edge();
-        if right_edge <= self.board.width() as i32 {
+        if right_edge < self.board.width() as i32 {
             let moved_right = self.active.updating_position_by_xy(1, 0);
             self.update_active_with(moved_right);
         }
@@ -108,21 +108,11 @@ impl Game {
     fn will_colide_with_block(&self) -> bool {
         let moved_down_points = self.active_figure_moved_down().to_cartesian();
         for point in moved_down_points {
-            if self.board_contains(point) {
+            if self.board.contains(point) {
                 return true;
             }
         }
         return false;
-    }
-
-    fn board_contains(&self, point: Point) -> bool {
-        if point.x < 0 || point.y < 0 {
-            return false;
-        }
-        return self
-            .board
-            .figure_at_xy(point.x as usize, point.y as usize)
-            .is_some();
     }
 
     fn active_figure_moved_down(&self) -> ActiveFigure {
@@ -219,10 +209,13 @@ mod game_tests {
     fn test_move_left_does_not_go_beyond_zero() {
         let mut game = get_game();
         game.active = ActiveFigure::new(FigureType::L, Point { x: 2, y: 0 });
+        game.active = game.active.rotated(); // left edge is now at x: 3
+        assert_eq!(game.active.left_edge(), 3);
+        game.move_left(); // x: 2
         game.move_left(); // x: 1
         game.move_left(); // x: 0
         game.move_left(); // x: 0
-        assert_eq!(game.active.position(), Point { x: 0, y: 0 });
+        assert_eq!(game.active.left_edge(), 0);
     }
     #[test]
     fn test_move_right() {
@@ -230,6 +223,17 @@ mod game_tests {
         game.active = ActiveFigure::new(FigureType::L, Point { x: 0, y: 0 });
         game.move_right();
         assert_eq!(game.active.position(), Point { x: 1, y: 0 });
+    }
+    #[test]
+    fn test_move_right_does_not_go_beyond_board_edge() {
+        let mut game = get_game();
+        game.active = ActiveFigure::new(FigureType::I, Point { x: 16, y: 0 });
+        game.active = game.active.rotated(); // right edge is now at 18
+        assert_eq!(game.active.left_edge(), 18);
+        game.move_right(); // x: 19
+        game.move_right(); // x: 20
+        game.move_right(); // x: 20
+        assert_eq!(game.active.right_edge(), 20);
     }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();
