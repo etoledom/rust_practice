@@ -37,11 +37,13 @@ impl Figure {
         let mut points = vec![];
         for y in 0..self.matrix.height() {
             for x in 0..self.matrix.width() {
-                if *self.matrix.at_xy(x, y) == 1 {
-                    points.push(Point {
-                        x: x as i32,
-                        y: y as i32,
-                    });
+                if let Some(element) = self.matrix.at_xy(x, y) {
+                    if *element == 1 {
+                        points.push(Point {
+                            x: x as i32,
+                            y: y as i32,
+                        });
+                    }
                 }
             }
         }

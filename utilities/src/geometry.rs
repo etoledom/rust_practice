@@ -12,8 +12,8 @@ pub struct UPoint {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Size {
-    pub height: u32,
-    pub width: u32,
+    pub height: usize,
+    pub width: usize,
 }
 
 #[derive(Debug, Clone, PartialEq)]

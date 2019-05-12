@@ -74,16 +74,16 @@ impl Game {
     }
 
     pub fn move_left(&mut self) {
-        let current_position = self.active.position();
-        if current_position.x > 0 {
+        let left_edge = self.active.left_edge();
+        if left_edge > 0 {
             let moved_left = self.active.updating_position_by_xy(-1, 0);
             self.update_active_with(moved_left);
         }
     }
 
     pub fn move_right(&mut self) {
-        let current_position = self.active.position();
-        if current_position.x <= self.board.width() as i32 {
+        let right_edge = self.active.right_edge();
+        if right_edge <= self.board.width() as i32 {
             let moved_right = self.active.updating_position_by_xy(1, 0);
             self.update_active_with(moved_right);
         }
