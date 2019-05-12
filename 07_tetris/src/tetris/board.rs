@@ -3,6 +3,7 @@ use super::FigureType;
 use super::Point;
 use super::Size;
 
+#[derive(Debug)]
 pub struct Board {
     matrix: Matrix<Option<FigureType>>,
 }

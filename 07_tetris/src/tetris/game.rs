@@ -92,6 +92,9 @@ impl Game {
     fn update_game(&mut self) {
         if self.can_move_down() {
             self.move_active_figure_down();
+        } else {
+            self.add_active_figure_to_board();
+            self.add_new_active_figure();
         }
     }
 
@@ -132,13 +135,29 @@ impl Game {
     fn update_active_with(&mut self, new_active: ActiveFigure) {
         self.active = new_active;
     }
+
+    fn add_active_figure_to_board(&mut self) {
+        println!("Adding to the board: {:?}", self.active.get_type());
+        for point in self.active.to_cartesian() {
+            self.board = self.board.replacing_figure_at_xy(
+                point.x as usize,
+                point.y as usize,
+                Some(self.active.get_type()),
+            );
+        }
+    }
+
+    fn add_new_active_figure(&mut self) {
+        let new_active = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
+        self.update_active_with(new_active);
+    }
 }
 
 #[cfg(test)]
 mod game_tests {
     use super::*;
     #[test]
-    fn test_active_figure_is_added_to_the_board() {
+    fn test_active_figure_is_draw() {
         let game = get_game();
         let active_points = game.active.to_cartesian();
         let drawed_points = draw_to_cartesian(game.draw());
@@ -234,6 +253,46 @@ mod game_tests {
         game.move_right(); // x: 20
         game.move_right(); // x: 20
         assert_eq!(game.active.right_edge(), 20);
+    }
+    #[test]
+    fn test_add_active_figure_to_board() {
+        let mut game = get_game();
+        assert!(game.draw_board().is_empty());
+        game.add_active_figure_to_board();
+        assert_eq!(game.draw_board().len(), 4);
+    }
+    #[test]
+    fn test_active_figure_is_added_when_it_touches_the_floor() {
+        let mut game = Game::new(Size {
+            height: 4,
+            width: 10,
+        });
+        assert_eq!(game.active.position().y, 0); // lowest figure block is at y: 1
+        assert!(game.draw_board().is_empty());
+        game.update(10.0); // y: 2
+        game.update(10.0); // y: 3
+        game.update(10.0); // -> Should add figure to board and create new active
+
+        assert_eq!(game.active.position().y, 0);
+        assert_eq!(game.draw_board().len(), 4);
+    }
+    #[test]
+    fn test_active_figure_is_added_when_touches_block() {
+        let mut game = Game::new(Size {
+            height: 7,
+            width: 10,
+        });
+        game.active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 5 });
+        game.update(10.0); // current figure should be added to the board
+        assert_eq!(game.draw_board().len(), 4); // Next figure should colide at y: 5
+
+        game.update(10.0); // y: 2
+        game.update(10.0); // y: 3
+        game.update(10.0); // y: 4
+        game.update(10.0); // y: 5
+
+        assert_eq!(game.active.position().y, 0);
+        assert_eq!(game.draw_board().len(), 8);
     }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();

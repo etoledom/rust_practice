@@ -39,6 +39,10 @@ impl ActiveFigure {
         return self.position;
     }
 
+    pub fn get_type(&self) -> FigureType {
+        return self.figure.get_type();
+    }
+
     pub fn left_edge(&self) -> i32 {
         let points = self.to_cartesian();
         return points.iter().fold(i32::max_value(), |edge, point| {
