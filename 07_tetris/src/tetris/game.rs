@@ -69,45 +69,36 @@ impl Game {
     }
 
     pub fn rotate(&mut self) {
-        let rotated = self.active.rotated();
-        self.update_active_with(rotated);
+        self.rotate_active_figure();
     }
 
     pub fn move_left(&mut self) {
-        if !self.can_move_left() {
-            return;
-        }
-        let left_edge = self.active.left_edge();
-        if left_edge > 0 {
-            let moved_left = self.active.updating_position_by_xy(-1, 0);
-            self.update_active_with(moved_left);
-        }
-    }
-
-    fn can_move_left(&self) -> bool {
-        let figure_moved_left = self.active_figure_moved_left();
-        return !self.will_colide_with_block(&figure_moved_left);
-    }
-
-    fn can_move_right(&self) -> bool {
-        let moved_right = self.active_figure_moved_right();
-        return !self.will_colide_with_block(&moved_right);
+        self.update_active_with(self.active_figure_moved_left());
     }
 
     pub fn move_right(&mut self) {
-        if !self.can_move_right() {
-            return;
-        }
-        let right_edge = self.active.right_edge();
-        if right_edge < (self.board.width() - 1) as i32 {
-            let moved_right = self.active.updating_position_by_xy(1, 0);
-            self.update_active_with(moved_right);
-        }
+        self.update_active_with(self.active_figure_moved_right());
+    }
+
+    pub fn move_down(&mut self) {
+        self.update_active_with(self.active_figure_moved_down());
+    }
+
+    fn has_valid_position(&self, active_figure: &ActiveFigure) -> bool {
+        return !self.will_colide_with_block(active_figure)
+            && !self.will_collide_with_edge(active_figure);
+    }
+
+    fn will_collide_with_edge(&self, active_figure: &ActiveFigure) -> bool {
+        let collided_with_left = active_figure.left_edge() < 0;
+        let collided_with_right = active_figure.right_edge() >= self.board.width() as i32;
+        let collided_with_bottom = active_figure.bottom_edge() >= self.board.height() as i32;
+        return collided_with_left || collided_with_right || collided_with_bottom;
     }
 
     fn update_game(&mut self) {
         if self.can_move_down() {
-            self.move_active_figure_down();
+            self.move_down();
         } else {
             self.add_active_figure_to_board();
             self.add_new_active_figure();
@@ -120,14 +111,11 @@ impl Game {
     }
 
     fn is_at_the_bottom(&self) -> bool {
-        return self.active.to_cartesian().iter().fold(false, |acc, point| {
-            acc || point.y == (self.board.height() as i32 - 1)
-        });
+        return self.active.bottom_edge() == (self.board.height() as i32 - 1);
     }
 
     fn will_colide_with_block(&self, figure: &ActiveFigure) -> bool {
         let points = figure.to_cartesian();
-        println!("Points: {:?}", points);
         for point in points {
             if self.board.contains(point) {
                 return true;
@@ -148,22 +136,31 @@ impl Game {
         return self.active.updating_position_by_xy(1, 0);
     }
 
-    fn move_active_figure_down(&mut self) {
-        let new_active = self.active_figure_moved_down();
-        self.update_active_with(new_active);
+    fn rotate_active_figure(&mut self) {
+        if let Some(rotated) = self.wall_kicked_rotated_active_figure() {
+            self.update_active_with(rotated);
+        }
     }
 
-    fn rotate_active_figure(&mut self) {
-        let new_active = self.active.rotated();
-        self.update_active_with(new_active);
+    fn wall_kicked_rotated_active_figure(&self) -> Option<ActiveFigure> {
+        let wall_kick_tests = self.active.wall_kick_tests();
+        for test in wall_kick_tests {
+            let moved_figure = self.active.updating_position_by_xy(test.x, test.y);
+            let test_figure = moved_figure.rotated();
+            if self.has_valid_position(&test_figure) {
+                return Some(test_figure);
+            }
+        }
+        return None;
     }
 
     fn update_active_with(&mut self, new_active: ActiveFigure) {
-        self.active = new_active;
+        if self.has_valid_position(&new_active) {
+            self.active = new_active;
+        }
     }
 
     fn add_active_figure_to_board(&mut self) {
-        println!("Adding to the board: {:?}", self.active.get_type());
         for point in self.active.to_cartesian() {
             self.board = self.board.replacing_figure_at_xy(
                 point.x as usize,
@@ -201,11 +198,21 @@ mod game_tests {
                 y: point.y + 1,
             })
             .collect();
-
-        game.move_active_figure_down();
+        game.move_down();
         let drawed_points = draw_to_cartesian(game.draw());
 
         assert_eq!(drawed_points, expected);
+    }
+    #[test]
+    fn test_active_figure_does_not_move_lower_than_floor() {
+        let mut game = get_game();
+        let y = game.board.height() as i32 - 3; // 3 spaces before the floor
+        game.active = ActiveFigure::new(FigureType::O, Point { x: 10, y });
+        game.move_down();
+        game.move_down();
+        game.move_down();
+        game.move_down();
+        assert!(game.is_at_the_bottom());
     }
     #[test]
     fn test_rotate_active_figure() {
@@ -221,9 +228,9 @@ mod game_tests {
             height: 4,
             width: 20,
         });
-        game.move_active_figure_down();
+        game.move_down();
         assert!(!game.is_at_the_bottom());
-        game.move_active_figure_down();
+        game.move_down();
         assert!(game.is_at_the_bottom());
     }
     #[test]
@@ -238,18 +245,20 @@ mod game_tests {
         game.board = game.board.replacing_figure_at_xy(2, 3, Some(FigureType::T));
         game.board = game.board.replacing_figure_at_xy(3, 3, Some(FigureType::T));
 
+        let colider = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
+        let rotated = colider.rotated();
+
         assert!(!game.will_colide_with_block(&game.active));
-        game.move_active_figure_down();
-        game.move_active_figure_down();
-        assert!(game.will_colide_with_block(&game.active));
+        assert!(game.will_colide_with_block(&rotated));
     }
 
     #[test]
     fn test_move_left() {
         let mut game = get_game();
         game.active = ActiveFigure::new(FigureType::L, Point { x: 10, y: 0 });
+        assert_eq!(game.active.left_edge(), 10);
         game.move_left();
-        assert_eq!(game.active.position(), Point { x: 9, y: 0 });
+        assert_eq!(game.active.left_edge(), 9);
     }
     #[test]
     fn test_move_left_does_not_go_beyond_zero() {
@@ -277,9 +286,8 @@ mod game_tests {
         game.active = game.active.rotated(); // right edge is now at 18
         assert_eq!(game.active.left_edge(), 18);
         game.move_right(); // x: 19
-        game.move_right(); // x: 20
-        game.move_right(); // x: 20
-        assert_eq!(game.active.right_edge(), 20);
+        game.move_right(); // x: 19
+        assert_eq!(game.active.right_edge(), 19);
     }
     #[test]
     fn test_add_active_figure_to_board() {

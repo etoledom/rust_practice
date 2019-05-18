@@ -8,6 +8,7 @@ use utilities::graphics::Color;
 pub struct ActiveFigure {
     figure: Figure,
     position: Point,
+    rotation_step: usize,
 }
 
 impl ActiveFigure {
@@ -15,6 +16,7 @@ impl ActiveFigure {
         return ActiveFigure {
             figure: Figure::new(figure_type),
             position,
+            rotation_step: 0,
         };
     }
 
@@ -63,6 +65,16 @@ impl ActiveFigure {
         });
     }
 
+    pub fn bottom_edge(&self) -> i32 {
+        let points = self.to_cartesian();
+        return points.iter().fold(i32::min_value(), |edge, point| {
+            if point.y > edge {
+                return point.y;
+            }
+            return edge;
+        });
+    }
+
     pub fn updating_position_by_xy(&self, x: i32, y: i32) -> ActiveFigure {
         return ActiveFigure {
             figure: self.figure.clone(),
@@ -70,7 +82,13 @@ impl ActiveFigure {
                 x: self.position().x + x,
                 y: self.position().y + y,
             },
+            ..*self
         };
+    }
+
+    pub fn wall_kick_tests(&self) -> Vec<Point> {
+        let kick_wall_tests_matrix = self.figure.wall_kick_tests();
+        return kick_wall_tests_matrix[self.rotation_step].clone();
     }
 
     pub fn rotated(&self) -> ActiveFigure {
@@ -78,7 +96,21 @@ impl ActiveFigure {
         return ActiveFigure {
             figure,
             position: self.position,
+            rotation_step: self.next_rotation_step(),
         };
+    }
+
+    fn next_rotation_step(&self) -> usize {
+        match self.get_type() {
+            FigureType::O => 0,
+            _ => {
+                let next_step = self.rotation_step + 1;
+                if next_step > 3 {
+                    return 0;
+                }
+                return next_step;
+            }
+        }
     }
 }
 
@@ -124,5 +156,41 @@ mod active_figure_tests {
         assert_eq!(edge, 5);
         let rotated_edge = figure.rotated().right_edge();
         assert_eq!(rotated_edge, 4);
+    }
+    #[test]
+    fn test_right_edge_L_horizontal() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 17, y: 2 });
+        let edge = figure.right_edge();
+        assert_eq!(edge, 20);
+    }
+    #[test]
+    fn test_bottom_edge() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 2, y: 2 });
+        let edge = figure.bottom_edge();
+        assert_eq!(edge, 3);
+        let rotated_edge = figure.rotated().bottom_edge();
+        assert_eq!(rotated_edge, 5);
+    }
+    #[test]
+    fn test_rotation_steps_O_figure() {
+        let figure = ActiveFigure::new(FigureType::O, Point { x: 0, y: 0 });
+        let rotated_01 = figure.rotated();
+        let rotated_02 = rotated_01.rotated();
+        assert_eq!(rotated_01.rotation_step, 0);
+        assert_eq!(rotated_02.rotation_step, 0);
+    }
+
+    fn test_totation_steps_non_O_figures() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
+        let rotation_01 = figure.rotated();
+        let rotation_02 = rotation_01.rotated();
+        let rotation_03 = rotation_02.rotated();
+        let rotation_04 = rotation_03.rotated();
+
+        assert_eq!(figure.rotation_step, 0);
+        assert_eq!(rotation_01.rotation_step, 1);
+        assert_eq!(rotation_02.rotation_step, 2);
+        assert_eq!(rotation_03.rotation_step, 3);
+        assert_eq!(rotation_04.rotation_step, 0);
     }
 }

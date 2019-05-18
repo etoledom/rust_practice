@@ -26,6 +26,10 @@ impl Figure {
         return self.figure_type.color();
     }
 
+    pub fn wall_kick_tests(&self) -> Vec<Vec<Point>> {
+        return self.figure_type.wall_kick();
+    }
+
     pub fn rotated(&self) -> Self {
         return Figure {
             matrix: self.matrix.rotated(),

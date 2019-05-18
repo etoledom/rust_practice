@@ -1,6 +1,7 @@
 // Based on https://tetris.fandom.com/wiki/SRS
 
 use super::matrix::Matrix;
+use utilities::geometry::Point;
 use utilities::graphics::Color;
 
 const I_COLOR: Color = Color {
@@ -89,6 +90,14 @@ impl FigureType {
         return Matrix::new(vectors);
     }
 
+    pub fn wall_kick(&self) -> Vec<Vec<Point>> {
+        return match self {
+            FigureType::O => vec![vec![]],
+            FigureType::L => FigureType::wall_kick_L(),
+            _ => FigureType::wall_kick_default(),
+        };
+    }
+
     fn draw_i(&self) -> Vec<Vec<u8>> {
         return vec![
             vec![0, 0, 0, 0], //
@@ -142,6 +151,72 @@ impl FigureType {
             vec![1, 1, 0], //
             vec![0, 1, 1],
             vec![0, 0, 0],
+        ];
+    }
+
+    fn wall_kick_default() -> Vec<Vec<Point>> {
+        return vec![
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: -1, y: 0 },
+                Point { x: -1, y: 1 },
+                Point { x: 0, y: -2 },
+                Point { x: -1, y: -2 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: -1, y: 1 },
+                Point { x: 0, y: 2 },
+                Point { x: 1, y: 2 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: 1, y: 1 },
+                Point { x: 0, y: -2 },
+                Point { x: 1, y: -2 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: -1, y: 0 },
+                Point { x: -1, y: -1 },
+                Point { x: 0, y: 2 },
+                Point { x: -1, y: 2 },
+            ],
+        ];
+    }
+
+    fn wall_kick_L() -> Vec<Vec<Point>> {
+        return vec![
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: -2, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: -2, y: -1 },
+                Point { x: 1, y: 2 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: -1, y: 0 },
+                Point { x: 2, y: 0 },
+                Point { x: -1, y: 2 },
+                Point { x: 2, y: -1 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: 2, y: 0 },
+                Point { x: -1, y: 0 },
+                Point { x: 2, y: 1 },
+                Point { x: -1, y: -2 },
+            ],
+            vec![
+                Point { x: 0, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: -2, y: 0 },
+                Point { x: 1, y: -2 },
+                Point { x: -2, y: 1 },
+            ],
         ];
     }
 }
