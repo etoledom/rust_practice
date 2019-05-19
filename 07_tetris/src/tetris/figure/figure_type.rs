@@ -93,7 +93,7 @@ impl FigureType {
     pub fn wall_kick(&self) -> Vec<Vec<Point>> {
         return match self {
             FigureType::O => vec![vec![]],
-            FigureType::L => FigureType::wall_kick_L(),
+            FigureType::L => FigureType::wall_kick_l(),
             _ => FigureType::wall_kick_default(),
         };
     }
@@ -187,7 +187,7 @@ impl FigureType {
         ];
     }
 
-    fn wall_kick_L() -> Vec<Vec<Point>> {
+    fn wall_kick_l() -> Vec<Vec<Point>> {
         return vec![
             vec![
                 Point { x: 0, y: 0 },

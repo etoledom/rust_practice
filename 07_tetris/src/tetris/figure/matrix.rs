@@ -62,4 +62,12 @@ impl<T> Matrix<T> {
         }
         return Matrix { data };
     }
+
+    pub fn row_at(&self, line: usize) -> Option<&Vec<T>> {
+        if line >= self.data.len() {
+            return None;
+        } else {
+            return Some(&self.data[line]);
+        }
+    }
 }

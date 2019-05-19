@@ -158,7 +158,7 @@ mod active_figure_tests {
         assert_eq!(rotated_edge, 4);
     }
     #[test]
-    fn test_right_edge_L_horizontal() {
+    fn test_right_edge_l_horizontal() {
         let figure = ActiveFigure::new(FigureType::I, Point { x: 17, y: 2 });
         let edge = figure.right_edge();
         assert_eq!(edge, 20);
@@ -172,15 +172,15 @@ mod active_figure_tests {
         assert_eq!(rotated_edge, 5);
     }
     #[test]
-    fn test_rotation_steps_O_figure() {
+    fn test_rotation_steps_o_figure() {
         let figure = ActiveFigure::new(FigureType::O, Point { x: 0, y: 0 });
         let rotated_01 = figure.rotated();
         let rotated_02 = rotated_01.rotated();
         assert_eq!(rotated_01.rotation_step, 0);
         assert_eq!(rotated_02.rotation_step, 0);
     }
-
-    fn test_totation_steps_non_O_figures() {
+    #[test]
+    fn test_totation_steps_non_o_figures() {
         let figure = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
         let rotation_01 = figure.rotated();
         let rotation_02 = rotation_01.rotated();

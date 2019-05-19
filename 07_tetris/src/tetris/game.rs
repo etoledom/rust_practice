@@ -1,6 +1,6 @@
 extern crate utilities;
 use super::active_figure::ActiveFigure;
-use super::figure::{Figure, FigureType};
+use super::figure::FigureType;
 use super::Board;
 pub use utilities::block::Block;
 use utilities::geometry::{Point, Size};
@@ -101,6 +101,8 @@ impl Game {
             self.move_down();
         } else {
             self.add_active_figure_to_board();
+            let completed_lines_count = self.remove_completed_lines();
+            self.add_points_for(completed_lines_count);
             self.add_new_active_figure();
         }
     }
@@ -173,6 +175,33 @@ impl Game {
     fn add_new_active_figure(&mut self) {
         let new_active = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
         self.update_active_with(new_active);
+    }
+
+    fn remove_completed_lines(&mut self) -> usize {
+        let lines = self.lines_completed();
+        self.board = self.board.removing_lines(&lines);
+        return lines.len();
+    }
+
+    fn lines_completed(&self) -> Vec<usize> {
+        let mut completed_lines: Vec<usize> = vec![];
+        for line_number in 0..self.board.height() {
+            if self.is_line_completed(line_number) {
+                completed_lines.push(line_number);
+            }
+        }
+        return completed_lines;
+    }
+
+    fn is_line_completed(&self, line_number: usize) -> bool {
+        if let Some(line) = self.board.get_line(line_number) {
+            return !line.contains(&None);
+        }
+        return false;
+    }
+
+    fn add_points_for(&mut self, completed_lines: usize) {
+        self.points += (completed_lines as u128) * 100;
     }
 }
 

@@ -59,7 +59,7 @@ impl Figure {
 mod figure_tests {
     use super::*;
     #[test]
-    fn test_T_figure_rotation() {
+    fn test_t_figure_rotation() {
         let figure = Figure::new(FigureType::T);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -78,7 +78,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_I_figure_rotation() {
+    fn test_i_figure_rotation() {
         let figure = Figure::new(FigureType::I);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -114,7 +114,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_L_figure_rotation() {
+    fn test_l_figure_rotation() {
         let figure = Figure::new(FigureType::L);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -133,7 +133,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_J_figure_rotation() {
+    fn test_j_figure_rotation() {
         let figure = Figure::new(FigureType::J);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -152,7 +152,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_S_figure_rotation() {
+    fn test_s_figure_rotation() {
         let figure = Figure::new(FigureType::S);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -171,7 +171,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_Z_figure_rotation() {
+    fn test_z_figure_rotation() {
         let figure = Figure::new(FigureType::Z);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
@@ -190,7 +190,7 @@ mod figure_tests {
         assert_eq!(full_loop_rotation.matrix, full_loop_rotation_matrix);
     }
     #[test]
-    fn test_O_figure_rotation() {
+    fn test_o_figure_rotation() {
         let figure = Figure::new(FigureType::O);
         let first_rotation = figure.rotated();
         let second_rotation = first_rotation.rotated();
