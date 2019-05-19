@@ -1,7 +1,4 @@
-use super::figure::Matrix;
-use super::FigureType;
-use super::Point;
-use super::Size;
+use super::{FigureType, Matrix, Point, Size};
 use std::collections::VecDeque;
 
 #[derive(Debug)]

@@ -1,18 +1,6 @@
-extern crate utilities;
-use super::active_figure::ActiveFigure;
-use super::figure::FigureType;
-use super::Board;
-pub use utilities::block::Block;
-use utilities::geometry::{Point, Size};
-use utilities::graphics::Color;
+use super::{ActiveFigure, Block, Board, FigureType, Point, Size};
 
 const MOVING_PERIOD: f64 = 0.2; //secs
-const BACKGROUND_COLOR: Color = Color {
-    red: 1.0,
-    green: 1.0,
-    blue: 1.0,
-    alpha: 1.0,
-};
 
 pub struct Game {
     board: Board,

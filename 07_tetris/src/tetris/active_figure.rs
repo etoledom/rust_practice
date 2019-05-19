@@ -1,8 +1,4 @@
-use super::figure::{Figure, FigureType};
-pub use utilities::block::Block;
-use utilities::geometry::Point;
-extern crate utilities;
-use utilities::graphics::Color;
+use super::{Color, Figure, FigureType, Point};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ActiveFigure {
