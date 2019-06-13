@@ -10,3 +10,5 @@ pub use game::{Game, Randomizer};
 use utilities::block::Block;
 use utilities::geometry::*;
 use utilities::graphics::Color;
+
+mod move_validator;

@@ -96,6 +96,18 @@ impl ActiveFigure {
         };
     }
 
+    pub fn moved_down(&self) -> ActiveFigure {
+        return self.updating_position_by_xy(0, 1);
+    }
+
+    pub fn moved_left(&self) -> ActiveFigure {
+        return self.updating_position_by_xy(-1, 0);
+    }
+
+    pub fn moved_right(&self) -> ActiveFigure {
+        return self.updating_position_by_xy(1, 0);
+    }
+
     fn next_rotation_step(&self) -> usize {
         match self.get_type() {
             FigureType::O => 0,
