@@ -2,23 +2,52 @@ use super::{ActiveFigure, Block, Board, FigureType, Point, Size};
 
 const MOVING_PERIOD: f64 = 0.2; //secs
 
+pub trait Randomizer {
+    fn random_between(&self, first: i32, last: i32) -> i32;
+}
+
 pub struct Game {
     board: Board,
     points: u128,
     active: ActiveFigure,
+    next: ActiveFigure,
     waiting_time: f64,
+    randomizer: Box<Randomizer + 'static>,
 }
 
 impl Game {
-    pub fn new(size: Size) -> Game {
-        let active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 0 });
+    pub fn new(size: Size, randomizer: Box<Randomizer + 'static>) -> Game {
+        let start_point = Game::figure_start_point(size.width);
+        let active = Game::random_figure(start_point, &randomizer);
+        let next = Game::random_figure(start_point, &randomizer);
+
         let board = Board::new(size);
         return Game {
             board,
             points: 0,
             active,
+            next,
             waiting_time: 0.0,
+            randomizer,
         };
+    }
+
+    fn figure_start_point(width: usize) -> Point {
+        let mid_point = (width as i32).wrapping_div(2) - 2;
+        return Point { x: mid_point, y: 0 };
+    }
+
+    fn random_figure(position: Point, randomizer: &Box<Randomizer + 'static>) -> ActiveFigure {
+        let figure = match randomizer.random_between(0, 6) {
+            0 => FigureType::I,
+            1 => FigureType::J,
+            2 => FigureType::L,
+            3 => FigureType::O,
+            4 => FigureType::S,
+            5 => FigureType::T,
+            _ => FigureType::Z,
+        };
+        return ActiveFigure::new(figure, position);
     }
 
     pub fn draw(&self) -> Vec<Block> {
@@ -161,8 +190,9 @@ impl Game {
     }
 
     fn add_new_active_figure(&mut self) {
-        let new_active = ActiveFigure::new(FigureType::I, Point { x: 0, y: 0 });
-        self.update_active_with(new_active);
+        let start_point = Game::figure_start_point(self.board.width());
+        self.update_active_with(self.next.clone());
+        self.next = Game::random_figure(start_point, &self.randomizer);
     }
 
     fn remove_completed_lines(&mut self) -> usize {
@@ -196,6 +226,17 @@ impl Game {
 #[cfg(test)]
 mod game_tests {
     use super::*;
+
+    struct Random {
+        number: i32,
+    }
+
+    impl Randomizer for Random {
+        fn random_between(&self, first: i32, last: i32) -> i32 {
+            return self.number;
+        }
+    }
+
     #[test]
     fn test_active_figure_is_draw() {
         let game = get_game();
@@ -241,10 +282,14 @@ mod game_tests {
     }
     #[test]
     fn test_active_figure_is_at_the_bottom() {
-        let mut game = Game::new(Size {
-            height: 4,
-            width: 20,
-        });
+        let box_rand = Box::new(Random { number: 5 });
+        let mut game = Game::new(
+            Size {
+                height: 4,
+                width: 20,
+            },
+            box_rand,
+        );
         game.move_down();
         assert!(!game.is_at_the_bottom());
         game.move_down();
@@ -252,10 +297,13 @@ mod game_tests {
     }
     #[test]
     fn test_will_colide_with_block() {
-        let mut game = Game::new(Size {
-            height: 4,
-            width: 4,
-        });
+        let mut game = Game::new(
+            Size {
+                height: 4,
+                width: 4,
+            },
+            Box::new(Random { number: 5 }),
+        );
 
         game.board = game.board.replacing_figure_at_xy(0, 3, Some(FigureType::T));
         game.board = game.board.replacing_figure_at_xy(1, 3, Some(FigureType::T));
@@ -315,10 +363,14 @@ mod game_tests {
     }
     #[test]
     fn test_active_figure_is_added_when_it_touches_the_floor() {
-        let mut game = Game::new(Size {
-            height: 4,
-            width: 10,
-        });
+        let rand = get_randomizer(5);
+        let mut game = Game::new(
+            Size {
+                height: 4,
+                width: 10,
+            },
+            rand,
+        );
         assert_eq!(game.active.position().y, 0); // lowest figure block is at y: 1
         assert!(game.draw_board().is_empty());
         game.update(10.0); // y: 2
@@ -330,14 +382,18 @@ mod game_tests {
     }
     #[test]
     fn test_active_figure_is_added_when_touches_block() {
-        let mut game = Game::new(Size {
-            height: 7,
-            width: 10,
-        });
-        game.active = ActiveFigure::new(FigureType::T, Point { x: 0, y: 5 });
+        let mut game = Game::new(
+            Size {
+                height: 7,
+                width: 10,
+            },
+            Box::new(Random { number: 5 }),
+        );
+        game.active = ActiveFigure::new(FigureType::L, Point { x: 5, y: 5 });
         game.update(10.0); // current figure should be added to the board
         assert_eq!(game.draw_board().len(), 4); // Next figure should colide at y: 5
 
+        game.update(10.0); // y: 1
         game.update(10.0); // y: 2
         game.update(10.0); // y: 3
         game.update(10.0); // y: 4
@@ -346,13 +402,38 @@ mod game_tests {
         assert_eq!(game.active.position().y, 0);
         assert_eq!(game.draw_board().len(), 8);
     }
+    #[test]
+    fn test_start_point_pair() {
+        let width = 10;
+        let start_point = Game::figure_start_point(width);
+        assert_eq!(start_point.x, 3);
+    }
+    #[test]
+    fn test_start_point_odd() {
+        let width = 11;
+        let start_point = Game::figure_start_point(width);
+        assert_eq!(start_point.x, 3);
+    }
+    #[test]
+    fn test_wallkick_L_left() {
+        let mut game = get_game();
+        game.active = ActiveFigure::new(FigureType::L, Point { x: 0, y: 5 });
+        game.rotate();
+        game.move_left();
+        game.rotate();
+        assert_eq!(game.active.position().x, 0);
+    }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();
     }
     fn get_game() -> Game {
-        return Game::new(Size {
+        let size = Size {
             height: 40,
             width: 20,
-        });
+        };
+        return Game::new(size, Box::new(Random { number: 5 }));
+    }
+    fn get_randomizer(number: i32) -> Box<Randomizer> {
+        return Box::new(Random { number: 5 });
     }
 }
