@@ -7,7 +7,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(size: Size) -> Board {
+    pub fn new(size: &Size) -> Board {
         let mut cells = vec![];
         for _y in 0..size.height {
             let line = Board::get_empty_line(size.width);
@@ -88,18 +88,18 @@ mod board_tests {
     #[test]
     fn test_height() {
         let height = 10;
-        let board = Board::new(Size { height, width: 10 });
+        let board = Board::new(&Size { height, width: 10 });
         assert_eq!(board.height(), height as usize);
     }
     #[test]
     fn test_width() {
         let width = 10;
-        let board = Board::new(Size { height: 10, width });
+        let board = Board::new(&Size { height: 10, width });
         assert_eq!(board.width(), width);
     }
     #[test]
     fn test_replacing_figure() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 2,
             width: 1,
         });
@@ -108,7 +108,7 @@ mod board_tests {
     }
     #[test]
     fn test_does_not_contains() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 4,
             width: 4,
         });
@@ -119,7 +119,7 @@ mod board_tests {
     }
     #[test]
     fn test_contains() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 4,
             width: 4,
         });
@@ -128,7 +128,7 @@ mod board_tests {
     }
     #[test]
     fn test_removing_lines() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 4,
             width: 1,
         });

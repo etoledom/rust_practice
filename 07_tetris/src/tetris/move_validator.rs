@@ -40,7 +40,7 @@ mod move_validator_tests {
 
     #[test]
     fn test_is_at_the_bottom() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 10,
             width: 10,
         });
@@ -50,7 +50,7 @@ mod move_validator_tests {
 
     #[test]
     fn test_is_at_the_bottom_return_false() {
-        let board = Board::new(Size {
+        let board = Board::new(&Size {
             height: 10,
             width: 10,
         });
@@ -59,7 +59,7 @@ mod move_validator_tests {
     }
     #[test]
     fn test_will_colide_with_block() {
-        let mut board = Board::new(Size {
+        let mut board = Board::new(&Size {
             height: 10,
             width: 10,
         });

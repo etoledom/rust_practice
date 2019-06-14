@@ -7,6 +7,12 @@ pub trait Randomizer {
     fn random_between(&self, first: i32, last: i32) -> i32;
 }
 
+#[derive(PartialEq)]
+pub enum GameState {
+    Playing,
+    GameOver,
+}
+
 pub struct Game {
     board: Board,
     points: u128,
@@ -14,10 +20,11 @@ pub struct Game {
     next: ActiveFigure,
     waiting_time: f64,
     randomizer: Box<Randomizer + 'static>,
+    state: GameState,
 }
 
 impl Game {
-    pub fn new(size: Size, randomizer: Box<Randomizer + 'static>) -> Game {
+    pub fn new(size: &Size, randomizer: Box<Randomizer + 'static>) -> Game {
         let start_point = Game::figure_start_point(size.width);
         let active = Game::random_figure(start_point, &randomizer);
         let next = Game::random_figure(start_point, &randomizer);
@@ -30,6 +37,7 @@ impl Game {
             next,
             waiting_time: 0.0,
             randomizer,
+            state: GameState::Playing,
         };
     }
 
@@ -49,6 +57,10 @@ impl Game {
             _ => FigureType::Z,
         };
         return ActiveFigure::new(figure, position);
+    }
+
+    pub fn is_game_over(&self) -> bool {
+        return self.state == GameState::GameOver;
     }
 
     // DRAWING FUNCTIONS
@@ -91,13 +103,27 @@ impl Game {
     }
 
     fn update_game(&mut self) {
+        if self.state == GameState::GameOver {
+            return;
+        }
         if can_move_down(&self.active, &self.board) {
             self.move_down();
         } else {
-            self.add_active_figure_to_board();
-            let completed_lines_count = self.remove_completed_lines();
-            self.add_points_for(completed_lines_count);
-            self.add_new_active_figure();
+            self.update_next_figure();
+        }
+    }
+
+    fn update_next_figure(&mut self) {
+        self.add_active_figure_to_board();
+        let completed_lines_count = self.remove_completed_lines();
+        self.add_points_for(completed_lines_count);
+        self.add_new_active_figure();
+        self.update_state();
+    }
+
+    fn update_state(&mut self) {
+        if self.check_is_game_over() {
+            self.state = GameState::GameOver;
         }
     }
 
@@ -188,6 +214,10 @@ impl Game {
 
     fn add_points_for(&mut self, completed_lines: usize) {
         self.points += (completed_lines as u128) * 100;
+    }
+
+    fn check_is_game_over(&self) -> bool {
+        return self.active.position().y == 0 && !has_valid_position(&self.active, &self.board);
     }
 }
 
@@ -296,13 +326,12 @@ mod game_tests {
     }
     #[test]
     fn test_active_figure_is_added_when_it_touches_the_floor() {
-        let rand = get_randomizer(5);
         let mut game = Game::new(
-            Size {
+            &Size {
                 height: 4,
                 width: 10,
             },
-            rand,
+            get_randomizer(5),
         );
         assert_eq!(game.active.position().y, 0); // lowest figure block is at y: 1
         assert!(game.draw_board().is_empty());
@@ -316,7 +345,7 @@ mod game_tests {
     #[test]
     fn test_active_figure_is_added_when_touches_block() {
         let mut game = Game::new(
-            Size {
+            &Size {
                 height: 7,
                 width: 10,
             },
@@ -356,6 +385,27 @@ mod game_tests {
         game.rotate();
         assert_eq!(game.active.position().x, 0);
     }
+    #[test]
+    fn test_is_game_over() {
+        let mut game = Game::new(
+            &Size {
+                height: 6,
+                width: 10,
+            },
+            get_randomizer(5),
+        );
+        game.board = game.board.replacing_figure_at_xy(3, 1, Some(FigureType::L));
+        game.board = game.board.replacing_figure_at_xy(4, 1, Some(FigureType::L));
+        game.board = game.board.replacing_figure_at_xy(5, 1, Some(FigureType::L));
+        game.update(10.0);
+        assert!(game.is_game_over());
+    }
+    #[test]
+    fn test_is_game_over_returns_false() {
+        let mut game = get_game();
+        game.update(10.0);
+        assert!(!game.is_game_over());
+    }
     fn draw_to_cartesian(draw: Vec<Block>) -> Vec<Point> {
         return draw.iter().map(|block| block.position()).collect();
     }
@@ -364,7 +414,7 @@ mod game_tests {
             height: 40,
             width: 20,
         };
-        return Game::new(size, Box::new(Random { number: 5 }));
+        return Game::new(&size, Box::new(Random { number: 5 }));
     }
     fn get_randomizer(_number: i32) -> Box<Randomizer> {
         return Box::new(Random { number: 5 });
