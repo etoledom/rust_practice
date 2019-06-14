@@ -71,22 +71,6 @@ impl ActiveFigure {
         });
     }
 
-    pub fn updating_position_by_xy(&self, x: i32, y: i32) -> ActiveFigure {
-        return ActiveFigure {
-            figure: self.figure.clone(),
-            position: Point {
-                x: self.position().x + x,
-                y: self.position().y + y,
-            },
-            ..*self
-        };
-    }
-
-    pub fn wall_kick_tests(&self) -> Vec<Point> {
-        let kick_wall_tests_matrix = self.figure.wall_kick_tests();
-        return kick_wall_tests_matrix[self.rotation_step].clone();
-    }
-
     pub fn rotated(&self) -> ActiveFigure {
         let figure = self.figure.rotated();
         return ActiveFigure {
@@ -108,6 +92,19 @@ impl ActiveFigure {
         return self.updating_position_by_xy(1, 0);
     }
 
+    pub fn wall_kicked_rotation_tests(&self) -> Vec<ActiveFigure> {
+        return self
+            .wall_kick_tests()
+            .iter()
+            .map(|point| self.updating_position_by_xy(point.x, point.y).rotated())
+            .collect();
+    }
+
+    fn wall_kick_tests(&self) -> Vec<Point> {
+        let kick_wall_tests_matrix = self.figure.wall_kick_tests();
+        return kick_wall_tests_matrix[self.rotation_step].clone();
+    }
+
     fn next_rotation_step(&self) -> usize {
         match self.get_type() {
             FigureType::O => 0,
@@ -119,6 +116,17 @@ impl ActiveFigure {
                 return next_step;
             }
         }
+    }
+
+    fn updating_position_by_xy(&self, x: i32, y: i32) -> ActiveFigure {
+        return ActiveFigure {
+            figure: self.figure.clone(),
+            position: Point {
+                x: self.position().x + x,
+                y: self.position().y + y,
+            },
+            ..*self
+        };
     }
 }
 
@@ -200,5 +208,20 @@ mod active_figure_tests {
         assert_eq!(rotation_02.rotation_step, 2);
         assert_eq!(rotation_03.rotation_step, 3);
         assert_eq!(rotation_04.rotation_step, 0);
+    }
+    #[test]
+    fn test_moved_left() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 1, y: 0 });
+        assert_eq!(figure.moved_left().position(), Point { x: 0, y: 0 });
+    }
+    #[test]
+    fn test_moved_right() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 1, y: 0 });
+        assert_eq!(figure.moved_right().position(), Point { x: 2, y: 0 });
+    }
+    #[test]
+    fn test_moved_down() {
+        let figure = ActiveFigure::new(FigureType::I, Point { x: 1, y: 0 });
+        assert_eq!(figure.moved_down().position(), Point { x: 1, y: 1 });
     }
 }

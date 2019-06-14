@@ -128,15 +128,11 @@ impl Game {
     // WALL KICK
 
     fn wall_kicked_rotated_active_figure(&self) -> Option<ActiveFigure> {
-        let wall_kick_tests = self.active.wall_kick_tests();
-        for test in wall_kick_tests {
-            let moved_figure = self.active.updating_position_by_xy(test.x, test.y);
-            let test_figure = moved_figure.rotated();
-            if has_valid_position(&test_figure, &self.board) {
-                return Some(test_figure);
-            }
-        }
-        return None;
+        return self
+            .active
+            .wall_kicked_rotation_tests()
+            .into_iter()
+            .find(|figure| has_valid_position(figure, &self.board));
     }
 
     // Game state mutation
@@ -204,7 +200,7 @@ mod game_tests {
     }
 
     impl Randomizer for Random {
-        fn random_between(&self, first: i32, last: i32) -> i32 {
+        fn random_between(&self, _first: i32, _last: i32) -> i32 {
             return self.number;
         }
     }
@@ -352,7 +348,7 @@ mod game_tests {
         assert_eq!(start_point.x, 3);
     }
     #[test]
-    fn test_wallkick_L_left() {
+    fn test_wallkick_l_left() {
         let mut game = get_game();
         game.active = ActiveFigure::new(FigureType::L, Point { x: 0, y: 5 });
         game.rotate();
@@ -370,7 +366,7 @@ mod game_tests {
         };
         return Game::new(size, Box::new(Random { number: 5 }));
     }
-    fn get_randomizer(number: i32) -> Box<Randomizer> {
+    fn get_randomizer(_number: i32) -> Box<Randomizer> {
         return Box::new(Random { number: 5 });
     }
 }
