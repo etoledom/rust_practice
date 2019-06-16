@@ -6,3 +6,6 @@ edition = "2018"
 
 [dependencies]
 utilities = { path = "../utilities" }
+tetris_core = "0.1.0"
+piston_window = "0.89.0"
+rand = "0.6.5"
