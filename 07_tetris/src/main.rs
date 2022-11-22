@@ -5,7 +5,7 @@ use draw::{draw_block, to_coord};
 use piston_window::types::Color as PistonColor;
 use piston_window::*;
 use rand::Rng;
-use tetris_core::{Game, Randomizer, Size};
+use tetris_core::{Action, Game, Randomizer, Size};
 
 const BACK_COLOR: PistonColor = [0.5, 0.5, 0.5, 1.0];
 
@@ -13,7 +13,7 @@ struct Rand;
 impl Randomizer for Rand {
     fn random_between(&self, lower: i32, higher: i32) -> i32 {
         let mut rng = rand::thread_rng();
-        return rng.gen_range(lower, higher);
+        return rng.gen_range(lower..higher);
     }
 }
 
@@ -41,14 +41,14 @@ fn main() {
                 game = Game::new(&game_size, Box::new(Rand {}));
             }
             match key {
-                Key::Left => game.move_left(),
-                Key::Right => game.move_right(),
-                Key::Space => game.rotate(),
-                Key::Down => game.move_down(),
+                Key::Left => game.perform(Action::MoveLeft),
+                Key::Right => game.perform(Action::MoveRight),
+                Key::Space => game.perform(Action::Rotate),
+                Key::Down => game.perform(Action::MoveDown),
                 _ => continue,
             }
         }
-        window.draw_2d(&event, |ctx, g2d| {
+        window.draw_2d(&event, |ctx, g2d, _| {
             clear(BACK_COLOR, g2d);
             let game_blocks = game.draw();
             for block in game_blocks {
